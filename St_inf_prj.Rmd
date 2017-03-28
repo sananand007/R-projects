@@ -1,0 +1,168 @@
+---
+title: "Statistical Inference Project Part01"
+author: "Sandeep Anand"
+date: "March 26, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, highlight=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Project Heading
+
+The project consists of two parts:
+
+1. A simulation exercise.
+2. Basic inferential data analysis.
+
+### Starting with the Simulation Excercise
+
+**Exponential Function**
+
+* In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. 
+* The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. 
+* The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda.
+
+**To-Do's [Step-by-Step]**
+
++ Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials. 
++ Show the sample mean and compare it to the theoretical mean of the distribution.
++ Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
++ Show that the distribution is approximately normal.
+
+```{r Exponential function}
+lambda<-0.2
+n=40
+B<-1000
+
+samplev<- rep(NA,1000)
+
+## Sample Vector
+for (i in 1:1000){
+  gen <- rexp(n,lambda)
+  samplev[i] <- mean(gen)
+}
+
+```
+
+## Showing the Sample Mean and Variance and Comparisions between the Sample and the Theoretical distributions
+
+
+```{r comparision of Mean and Variance, echo=TRUE}
+library(ggplot2)
+
+#########################
+#       Mean            #
+#########################
+
+sample_mean<-mean(samplev)
+
+given_mean<-1/lambda
+
+vect <- c(sample_mean, given_mean)
+
+sample_mean
+given_mean
+
+g<-ggplot(data.frame(vect), aes(seq_along(vect), vect)) +
+  geom_bar(stat = "identity")+ 
+  geom_hline(yintercept = sample_mean, color="red", lty=2) + 
+  geom_hline(yintercept = given_mean, color="blue")
+
+print(g)
+
+
+#########################
+#       Variance        #
+#########################
+
+sample_var<-var(samplev)
+
+given_var<-(1/lambda)^2/n
+
+vect_var <- c(sample_var, given_var)
+
+sample_var
+given_var
+
+g2<-ggplot(data.frame(vect_var), aes(seq_along(vect_var), vect_var)) +
+  geom_bar(stat = "identity")+
+  geom_hline(yintercept = sample_var, color="red", lty=2) + 
+  geom_hline(yintercept = given_var, color="blue")
+
+print(g2)
+
+```
+
+
+### Check to show that the distribution is Normal
+
+####A random variable is log-normally distributed if its log is a normally distributed random variable and it fits a bell curve
+
+
+```{r Multiplot function, echo=FALSE}
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+
+```{r Check to show that the distribution is Normal, echo=TRUE}
+
+# To See if the disctribution is approximately Normal
+
+g1<-ggplot(data = data.frame(samplev), aes(samplev))+
+    geom_histogram(color="lightblue",bins = 20)+ggtitle("Check for a Normal Distribution")
+
+g3<-ggplot(data=data.frame(samplev),aes(samplev))+
+    geom_density(color="blue")+ggtitle("Check to see if this is a Bell Curve")
+
+multiplot(g1, g3)
+
+```
+
+# Conclusion
+**Result : The Distribution is Normal as seen from the Curves above**

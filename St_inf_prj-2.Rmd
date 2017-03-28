@@ -1,0 +1,65 @@
+---
+title: "Statistical Inference Project Part02"
+author: "Sandeep Anand"
+date: "March 27, 2017"
+output: pdf_document
+---
+
+## Part-2 Of the Statistical Inference Project: 
+* Analyze the ToothGrowth data in the R datasets package
+* Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+* State the conclusions
+
+```{r Basic structure & Summary of the ToothGrowth data, echo=TRUE}
+data(ToothGrowth)
+str(ToothGrowth)
+
+# Summary
+summary(ToothGrowth)
+```
+
+# Description of analysis with Graphs
+### Toothgrowth comparision with respect to two groups OJ and VC 
+```{r Analysis of dosage, echo=TRUE}
+library(ggplot2)
+
+g4<-ggplot(ToothGrowth, aes(x=factor(dose), y=len, fill=factor(dose))) +
+    geom_boxplot()+facet_grid(.~supp)+
+    ggtitle("Analyzing Toothgrowth data based on Type of Dose")
+
+print(g4)
+
+```
+
+### Toothgrowth comparision with averages
+```{r Analysis of dosage trends, echo=TRUE}
+
+avg<-aggregate(ToothGrowth$len,by=list(dose=ToothGrowth$dose,supp=ToothGrowth$supp),FUN=mean)
+
+avg
+
+g5<-ggplot(ToothGrowth, aes(x=factor(dose), y=len)) +
+    geom_point(aes(color=supp))+facet_grid(.~supp)+
+    ggtitle("Analyzing Toothgrowth data trends based on Dosage")
+
+
+print(g5)
+
+g<- ggplot(avg, aes(x=factor(dose), y=avg$x, color=avg$supp))+
+    geom_point(aes(size=avg$x))
+print(g)
+
+```
+
+
+## Using Confidence Intervals and hypothesis tests to compare tooth growth by Supplement and Dosage.
+```{r confidence Intervals and hypothesis tests, echo=TRUE}
+
+print(t.test(len~supp,data = ToothGrowth, paired = FALSE))
+
+```
+
+# Conclusions
+
+### The boxplots show that the growth is faster in case of dose = VC than dose = OJ . The 95% Confidence interval is got as (-0.171,7.571) 
+As tooth size increases , dosage is also higher
