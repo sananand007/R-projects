@@ -13,3 +13,7 @@
 	+ Analyse the ToothGrowth data 
 	+ Do a 	exploratory Data analysis
 	+ State conclusions to the fullest
+	
+3. Added a Small tool to check MSE using R and Manipulate , with the Help of Coursera DS specialization
+	*Using the Manipulate library to create the slider with R
+	*Using ggplot2 to plot a histogram of the child heights data from the galton data frame
