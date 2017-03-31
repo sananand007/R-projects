@@ -1,0 +1,27 @@
+---
+title: "Linear Regression"
+author: "Sandeep Anand"
+date: "March 31, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Demonstation of the lm() function and Simple Linear Regression
+
+### This part is contributed from data archive at Princeton Examples from http://data.princeton.edu/R/readingData.html 
+
+```{r Reading the Data}
+fpe<-read.table("http://data.princeton.edu/wws509/datasets/effort.dat", header = TRUE)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
