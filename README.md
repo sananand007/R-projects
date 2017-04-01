@@ -19,3 +19,6 @@
 	+ Using ggplot2 to plot a histogram of the child heights data from the galton data frame
 	+ Using Manipulate to calculate the MSE by calculation of  squared vertical distances for Parent's distribution using y = x(Beta), where Beta is the slope of the equation
 	+ Also demonstating what is linear fitting
+	
+4 ** Adding A descrpiption Linear model Description and the use of the plot(lmfit) function 
+	+ Plots showing the residual vs Fitted points | Q-Q normal plots , showing the change (as modeled against) setting + effort

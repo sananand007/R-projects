@@ -17,11 +17,28 @@ knitr::opts_chunk$set(echo = TRUE)
 fpe<-read.table("http://data.princeton.edu/wws509/datasets/effort.dat", header = TRUE)
 ```
 
-## Including Plots
+## Scatter Plot of Change based on Effort of the above Family Planning data
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r chagne vs Effort, echo=FALSE}
+plot(fpe$effort, fpe$change, pch=21, bg="green")
+title("Scatterplot of change by Effort", col.main="#3366CC")
 ```
 
+## Fitting a linear Model
+
+> Note first that lm is a function, and we assign the result to an object that we choose to call lmfit (for linear model fit). This stores the results of the fit for later examination.
+
+> The argument to lm is a model formula, which has the response on the left of the tilde ~ (read "is modeled as") and a Wilkinson-Rogers model specification formula on the right. R uses
+
+  +	to combine elementary terms, as in A+B
+  + :	for interactions, as in A:B
+  *	for both main effects and interactions, so A*B = A+B+A:B
+
+
+```{r fitting a linear model, echo=TRUE}
+lmfit<-lm( change ~ setting+effort, data = fpe)
+summary(lmfit)
+anova(lmfit)
+plot(lmfit)
+```
