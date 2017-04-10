@@ -5,7 +5,7 @@ date: "March 31, 2017"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, highlight=TRUE, tidy=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -41,4 +41,56 @@ lmfit<-lm( change ~ setting+effort, data = fpe)
 summary(lmfit)
 anova(lmfit)
 plot(lmfit)
+```
+
+```{r Using Galton data to find the relations, fig.height=4,fig.width=4, echo=TRUE}
+library(UsingR) 
+library(ggplot2)
+data(galton)
+
+y<-galton$child #Outcome
+x<-galton$parent #Predictor
+
+coef(lm(y~x))
+
+beta1<-cor(y,x)*sd(y)/sd(x)
+beta0<-mean(y) - beta1*mean(x)
+
+rbind(c(beta0, beta1), coef(lm(y~x)))
+```
+
+## Fitting a linear model through a data
+
+```{r Fitting a Linear model through the galton, fig.height=4,fig.width=4, echo=FALSE}
+library(UsingR)
+library(ggplot2)
+data(galton)
+
+y<-galton$child - mean(galton$child)
+x<-galton$parent - mean(galton$parent)
+# n<-galton$child
+# m<-galton$parent
+
+freq.data<- as.data.frame(table(x,y))
+#freq.data_2<- as.data.frame(table(n,m))
+
+names(freq.data)<-c('child', 'parent', 'freq')
+
+freq.data$child<-as.numeric(as.character(freq.data$child))
+freq.data$parent<-as.numeric(as.character(freq.data$parent))
+
+new.freq.data<-filter(freq.data, freq.data$freq>0)
+
+head(new.freq.data)
+
+g<-ggplot(freq.data, aes(x=parent, y=child))
+g<-g+ scale_size(range = c(2,20), guide = "none")
+g<-g+ geom_point(color="grey40", aes(size=freq+20, show_guide=FALSE))
+g<-g+ geom_point(aes(colour=freq, size=freq))
+g<-g+ scale_colour_gradient(low = "lightblue", high = "white")
+g<-g+ geom_smooth(method = "lm", formula = y~x)
+
+g  
+  #mse<-mean((y-beta*x)^2)
+  #g<-g+ggtitle(paste("beta=", beta, "mse=", round(mse,3)))
 ```
