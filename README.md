@@ -22,3 +22,21 @@
 	
 4. **Adding A descrpiption Linear model Description and the use of the plot(lmfit) function**
 	+ Plots showing the residual vs Fitted points | Q-Q normal plots , showing the change (as modeled against) setting + effort
+	
+5. ** Multivariate Regression and Regression through the origin**
+	+ Basic Multivariate Regression models
+	+ Regression threough the Origin 
+	+ Using datasets such as swiss, Insectsprays 
+	+ Understanding the effect of multiple predictors/covariates on response and the other variates 
+	+ Factor variables in a linear model
+
+6. **Adjustment**
+	+ Idea of putting a regressor through a linear model to investigate the role of a third variable on the relationship between the other two
+	+ Case:1 - Strong marginal effect (ie, change in the intercept), when x or the regressor is discarded  and very less effect when x is included 
+	+ Case:2 - less marginal effect (ie, change in the intercept), when x or the regressor is discarded  and very high effect when x is included 
+	+ Case:3 - x is such that there is no overlap in the above two cases , and there will be cases when there will be ovelap occuring
+	* Simpsons Paradox - Simpson’s paradox refers to a phenomena whereby the association between a pair of variables
+		(X, Y ) reverses sign upon conditioning of a third variable, Z, regardless of the value taken
+		by Z. 
+		- You look at a variable as it relates to an outcome and that affect reverses itself with the inclusion of another variable (regressor)
+		- Things can change to the exact opposite if you perform adjustment
