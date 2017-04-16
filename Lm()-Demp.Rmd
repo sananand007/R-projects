@@ -94,3 +94,20 @@ g
   #mse<-mean((y-beta*x)^2)
   #g<-g+ggtitle(paste("beta=", beta, "mse=", round(mse,3)))
 ```
+
+## Example of RTO , Regression through the origin and Mutlivariate regression
+* How lm adjusts to the regression estimate with respect to the other variable
+* Affect of the other variables have been removed from the predictor and the response
+
+```{r RTO, echo=TRUE}
+n = 100; x=rnorm(n); x2=rnorm(n); x3=rnorm(n)
+y = 1+x+x2+x3+rnorm(n,sd=.1)
+ey = resid(lm(y~x2+x3)) # This also includes the intercept
+ex = resid(lm(x~x2+x3)) # This also includes the intercept
+sum(ey*ex)/sum(ex^2)
+coef(lm(ey~ex-1)) # Taking out the intercept term out here
+coef(lm(y~x+x2+x3))
+
+```
+
+

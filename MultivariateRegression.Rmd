@@ -1,0 +1,104 @@
+---
+title: "Multi-Variate-regression"
+author: "Sandeep Anand"
+date: "April 15, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE, highlight=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+## MutiVariate Regression
+
+```{r MV-1,echo=TRUE}
+require(datasets);data(swiss);require(ggplot2);require(GGally)
+g = ggpairs(swiss, lower=list(continous="smooth"), wrap=c(geom_smooth(method = "loess")))
+g
+
+```
+
+--- Calling 'lm'
++ Fitting all the variables
+
+```{r Fit-1,echo=TRUE}
+summary(lm(Fertility~., data=swiss))$coef
+```
+
++ The -0.17 , means that there is an expected decrease of 0.17 in fertility for men , for every 1% increase in percentage of males involved in Agriculture , and this is the case with other variables remaining constant
++ Just to consider that the these are actually percentages 
++ R actually gives us the t-value for a t-test of H0: Beta(agri) = 0
+
+--- Case when we only do a regression of the response Fertility and the variable Agriculture and not consider the other variables here
++ Fitting only Agriculture
+
+```{r Fit-2,echo=TRUE}
+summary(lm(Fertility~Agriculture, data=swiss))$coef
+```
+
++ You can see for this case the trend of how fertility depends on Agriculture actually changes in a different direction, when keeping the other variables fixed
++ **Regression is a thinking process , basically which particular variables/Covariates to include and which to not**
++ If you see a NA , as the estimate at the end of the coefficients that is probably a completely unnecessary and is not having any causal relationship
++ If a particular predictor/covariate is highly causal , then excluding that will cause a high residue of that to be used as the other covariate and the relatioship/coefficients of the linear model will change a lot, The response could pick up a big residual effect of a covariate that is not picked and it picked up as the current response
++ We can also plot the residuals to find the relationships for them
+
+
+```{r Fit-3,echo=TRUE}
+data(InsectSprays);library(ggplot2)
+g<-ggplot(data=InsectSprays, aes(y=count, x=spray, fill=spray))
+g<-g+geom_violin(colour="black", size=2)
+g<-g+xlab("Spray Type")+ylab("Insect Count")
+g
+```
+
++ The Intercept for the lm() function is basically the mean of the particular value that is omitted here, for the below case it is Spray A
++ We cannot force include spray A , otherwise if we try, R will drop one of them to NA
++ Though if we really want to drop the Intercept , we can use it and we will see all the sprays , but in this case , obviously there are no relative comparisions , you will see just the direct means as the estimates
++ **The reason we do a relative with intercept is so that we can compare different datasets and their relationships , for this case we would like to know how each spray is different from spray A and the probability of the t test that we are conducting , the t test being the (estimate diff)/(Standard error) . If we omit the intercept , then we are just comparing each of the Sprays with 0, that is if they killed more number of intsects
+```{r Fit-4, echo=TRUE}
+summary(lm(count~spray, data=InsectSprays))$coef
+
+# Do the same thing manually or hardcoded
+summary(lm(count~
+             I(1*(spray=="B"))+I(1*(spray=="C"))+I(1*(spray=="D")) + I(1*(spray=="E"))+  I(1*(spray=="F")) 
+           , data = InsectSprays))$coef
+summary(lm(count~spray-1,data=InsectSprays))$coef
+
+```
+---
+Reordering the levels
++ Intercept is treated as the mean of that reference level
++ All the other sprays are comparision of that spray with the reference level
++ The tests will be test of the comparision with the spray A
+```{r Fit-5, echo=TRUE}
+spray2<-relevel(InsectSprays$spray, "C")
+summary(lm(count~spray2,data=InsectSprays))$coef
+```
+--- Ancova
++ Analysis of Covariance
++ Fitting a number of lines with different intercepts 
++ If you multiply you will get an interaction
+```{r Analysis of Covariance, echo=TRUE}
+library(datasets);data(swiss);library(ggplot2)
+head(swiss)
+
+# Create a binary  catholic variable, 1 if the county is majority catholic and majority protestant
+library(dplyr)
+swiss = mutate(swiss, CatholicBin=1*(Catholic>50))
+
+#fit4<- lm(Fertility~Agriculture, data=swiss)
+
+#fit5<-lm(Fertility~Agriculture+factor(CatholicBin), data=swiss)
+
+fit6<-lm(Fertility~Agriculture*factor(CatholicBin), data=swiss)
+
+g<-ggplot(swiss, aes(x=Agriculture, y=Fertility, colour=factor(CatholicBin)))
+g=g+geom_point(size=6, colour="black")+geom_point(size=4)
+g=g+xlab("% in Agriculture") + ylab("Fertility")
+
+g3<-g
+g3<-g3+geom_abline(intercept = coef(fit6)[1], slope=coef(fit6)[2], size=2)
+g3<-g3+geom_abline(intercept = coef(fit6)[1]+coef(fit6)[3], slope=coef(fit6)[2]+coef(fit6)[4], size=2)
+g3
+```
