@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ---
-## MutiVariate Regression
+##MutiVariate Regression
 
 ```{r MV-1,echo=TRUE}
 require(datasets);data(swiss);require(ggplot2);require(GGally)
@@ -19,29 +19,31 @@ g
 
 ```
 
---- Calling 'lm'
-+ Fitting all the variables
+---
+## Calling 'lm'
+* Fitting all the variables
 
 ```{r Fit-1,echo=TRUE}
 summary(lm(Fertility~., data=swiss))$coef
 ```
 
-+ The -0.17 , means that there is an expected decrease of 0.17 in fertility for men , for every 1% increase in percentage of males involved in Agriculture , and this is the case with other variables remaining constant
-+ Just to consider that the these are actually percentages 
-+ R actually gives us the t-value for a t-test of H0: Beta(agri) = 0
+* The -0.17 , means that there is an expected decrease of 0.17 in fertility for men , for every 1% increase in percentage of males involved in Agriculture , and this is the case with other variables remaining constant
+* Just to consider that the these are actually percentages 
+* R actually gives us the t-value for a t-test of H0: Beta(agri) = 0
 
---- Case when we only do a regression of the response Fertility and the variable Agriculture and not consider the other variables here
-+ Fitting only Agriculture
+---
+Case when we only do a regression of the response Fertility and the variable Agriculture and not consider the other variables here
+* Fitting only Agriculture
 
 ```{r Fit-2,echo=TRUE}
 summary(lm(Fertility~Agriculture, data=swiss))$coef
 ```
 
-+ You can see for this case the trend of how fertility depends on Agriculture actually changes in a different direction, when keeping the other variables fixed
-+ **Regression is a thinking process , basically which particular variables/Covariates to include and which to not**
-+ If you see a NA , as the estimate at the end of the coefficients that is probably a completely unnecessary and is not having any causal relationship
-+ If a particular predictor/covariate is highly causal , then excluding that will cause a high residue of that to be used as the other covariate and the relatioship/coefficients of the linear model will change a lot, The response could pick up a big residual effect of a covariate that is not picked and it picked up as the current response
-+ We can also plot the residuals to find the relationships for them
+* You can see for this case the trend of how fertility depends on Agriculture actually changes in a different direction, when keeping the other variables fixed
+* **Regression is a thinking process , basically which particular variables/Covariates to include and which to not**
+* If you see a NA , as the estimate at the end of the coefficients that is probably a completely unnecessary and is not having any causal relationship
+* If a particular predictor/covariate is highly causal , then excluding that will cause a high residue of that to be used as the other covariate and the relatioship/coefficients of the linear model will change a lot, The response could pick up a big residual effect of a covariate that is not picked and it picked up as the current response
+* We can also plot the residuals to find the relationships for them
 
 
 ```{r Fit-3,echo=TRUE}
@@ -52,10 +54,10 @@ g<-g+xlab("Spray Type")+ylab("Insect Count")
 g
 ```
 
-+ The Intercept for the lm() function is basically the mean of the particular value that is omitted here, for the below case it is Spray A
-+ We cannot force include spray A , otherwise if we try, R will drop one of them to NA
-+ Though if we really want to drop the Intercept , we can use it and we will see all the sprays , but in this case , obviously there are no relative comparisions , you will see just the direct means as the estimates
-+ **The reason we do a relative with intercept is so that we can compare different datasets and their relationships , for this case we would like to know how each spray is different from spray A and the probability of the t test that we are conducting , the t test being the (estimate diff)/(Standard error) . If we omit the intercept , then we are just comparing each of the Sprays with 0, that is if they killed more number of intsects
+* The Intercept for the lm() function is basically the mean of the particular value that is omitted here, for the below case it is Spray A
+* We cannot force include spray A , otherwise if we try, R will drop one of them to NA
+* Though if we really want to drop the Intercept , we can use it and we will see all the sprays , but in this case , obviously there are no relative comparisions , you will see just the direct means as the estimates
+* **The reason we do a relative with intercept is so that we can compare different datasets and their relationships , for this case we would like to know how each spray is different from spray A and the probability of the t test that we are conducting , the t test being the (estimate diff)/(Standard error) . If we omit the intercept , then we are just comparing each of the Sprays with 0, that is if they killed more number of intsects**
 ```{r Fit-4, echo=TRUE}
 summary(lm(count~spray, data=InsectSprays))$coef
 
@@ -68,17 +70,17 @@ summary(lm(count~spray-1,data=InsectSprays))$coef
 ```
 ---
 Reordering the levels
-+ Intercept is treated as the mean of that reference level
-+ All the other sprays are comparision of that spray with the reference level
-+ The tests will be test of the comparision with the spray A
+* Intercept is treated as the mean of that reference level
+* All the other sprays are comparision of that spray with the reference level
+* The tests will be test of the comparision with the spray A
 ```{r Fit-5, echo=TRUE}
 spray2<-relevel(InsectSprays$spray, "C")
 summary(lm(count~spray2,data=InsectSprays))$coef
 ```
---- Ancova
-+ Analysis of Covariance
-+ Fitting a number of lines with different intercepts 
-+ If you multiply you will get an interaction
+---Ancova
+* Analysis of Covariance
+* Fitting a number of lines with different intercepts 
+* If you multiply you will get an interaction
 ```{r Analysis of Covariance, echo=TRUE}
 library(datasets);data(swiss);library(ggplot2)
 head(swiss)
@@ -101,4 +103,89 @@ g3<-g
 g3<-g3+geom_abline(intercept = coef(fit6)[1], slope=coef(fit6)[2], size=2)
 g3<-g3+geom_abline(intercept = coef(fit6)[1]+coef(fit6)[3], slope=coef(fit6)[2]+coef(fit6)[4], size=2)
 g3
+```
+--- 
+### Analysis of residuals,Residual vs Fit
+* To understand these plots , we would need to know Influential, high leverage and outlying points
+* A data point that is very far from the middle of the axis or the Average will have high leverage/influence , basically the averages of (x,y) can be said as the fulcrum and the   farther you are away from the fulcrum it will be more influential and the nearer you are , you are less influential
+* Influence is the conditon wether a point which has a higher leverage , but weather the point opts to exert that leverage is the important part, 
+  + The point will not have a large dfbeta value , but it will have a large leverage value
+* **Outliers** - It could be due to spurious or due to real processes 
+* Influence can be checked best , by keeping the point and check what are the values you are estimating and then take out the point and see how the estimates are changing 
+  + Check ?influence.measures , for most of the outlier analysis and the functions you will need to do analysis
+  + press residuals = resid(fit)/(1-hatvalues(fit))
+* A fitted model having been produced, each observation in turn is removed and the model is refitted using the remaining observations. The out-of-sample predicted value is calculated for the omitted observation in each case, and the PRESS statistic is calculated as the sum of the squares of all the resulting prediction errors  
+* equation block:
+  $$PRESS=\sum_{i=1}^{n} (y_i-\hat{y_i})^{2}$$
+  + Given this procedure, the PRESS statistic can be calculated for a number of candidate model structures for the same dataset, with the lowest values of PRESS indicating the best structures. Models that are over-parameterised (over-fitted) would tend to give small residuals for observations included in the model-fitting but large residuals for observations that are excluded.
+*  Plotting   
+  + The Main plot that everyone does is to plot the residuals vs Fitted values
+  + Q-Q plot generally checks normality
+  + Standarized plots , plotting residuals at a different scale level
+  + Residuals vs Leverage, looks at any systematic pattern
+* The hatvalues always lie between [0,1]
+* Residual plots are very important as they zoom in very finely to the aspects of poor model fit
+```{r Residual Analysis, echo=TRUE}
+data(swiss);library(ggplot2);par(mfrow=c(2,2))
+fit7<-lm(Fertility~., data = swiss); plot(fit7)
+```
+
+---
+### Model Selection
+* Finding the Simplest model to represent what we are looking for
+* *Occam's Razor* All loss being equal, probably the simplest model is the right one
+* Model is the lens through with you are looking at data
+* Important to know what regressors are important and need to be included and which are not important and do not need to be included
+* Including any new variables always increases the Standard errors 
+* $$R^{2}$$ increases monotonically as more number of regressors are included
+* SSE decreases monotonically as more number of regressors are included
+
+# To-do: Variation Inflation
+#### Do not generally see a variance go up, if you add a regressor , as the variance is estimated than the actual variance
+* If the Variable/Regressor that you include for fitting a linear model is highly correlated , then the response , then the variation will inflate a lot and we also increase the Standard errors, that is why randomization of the variables are very important
+* Commonly used term in Regression models , ie, VIF (Variaition Inflation Factor)
+* If everything else is uncorellated to the other covariates to what we are interested in then we do not see much variation inflation
+
+```{r variation Inflatio, echo=TRUE}
+n <- 100; nosim <- 1000
+x1 <- rnorm(n); x2 <- x1/sqrt(2) + rnorm(n) /sqrt(2)
+x3 <- x1 * 0.95 + rnorm(n) * sqrt(1 - 0.95^2); 
+betas <- sapply(1 : nosim, function(i){
+  y <- x1 + rnorm(n, sd = .3)
+  c(coef(lm(y ~ x1))[2], 
+    coef(lm(y ~ x1 + x2))[2], 
+    coef(lm(y ~ x1 + x2 + x3))[2])
+})
+round(apply(betas, 1, sd), 5)
+
+library(car)
+fit8<-lm(Fertility~., data = swiss)
+vif(fit8)
+```
+---
+## Variance inflation factors
+* Notice variance inflation was much worse when we included a variable that was highly related to x1.
+* We don't know $\sigma$, so we can only estimate the increase in the actual standard error of the coefficients for including a regressor.
+* However, $\sigma$ drops out of the relative standard errors. If one sequentially adds variables, one can check the variance (or sd) inflation for including each one.
+* When the other regressors are actually orthogonal to the regressor of interest, then there is no variance inflation.
+* The variance inflation factor (VIF) is the increase in the variance for the ith regressor compared to the ideal setting where it is orthogonal to the other regressors.
+  + (The square root of the VIF is the increase in the sd ...)
+* Remember, variance inflation is only part of the picture. We want to include certain variables, even if they dramatically inflate our variance.
+
+---
+## Residual Variation
+* If we overfit or correctly fit the model, including all the necessary covariates and/or unnecessary   covariates , the variance estimate is unbiased
+* However , the variance of the variance is higher if we start to include unnecessary variables
+* If we have a lot of regressors there are particular techniques such as PCA and factor analytic models on covariates , that are often useful to reduce the number of complex covariate spaces 
+* Good design and keeping the model covariates as random as possible , will actually lead to have a better model where we do not need all these complex analysis
+* A good automated regression model, is nested likelihood ratio
+
+* Given a coefficient that I'm interested in, I like to use covariate adjustment and multiple models to probe that effect to evaluate it for robustness and to see what other       covariates knock it out. This isn't a terribly systematic approach, but it tends to teach you a lot about the the data as you get your hands dirty.
+
+## How to do nested model testing in R
+```{r anova,echo=TRUE}
+fit1 <- lm(Fertility ~ Agriculture, data = swiss)
+fit3 <- update(fit8, Fertility ~ Agriculture + Examination + Education)
+fit5 <- update(fit8, Fertility ~ Agriculture + Examination + Education + Catholic + Infant.Mortality)
+anova(fit1, fit3, fit5)
 ```

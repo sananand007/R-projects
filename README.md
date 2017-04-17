@@ -23,7 +23,7 @@
 4. **Adding A descrpiption Linear model Description and the use of the plot(lmfit) function**
 	+ Plots showing the residual vs Fitted points | Q-Q normal plots , showing the change (as modeled against) setting + effort
 	
-5. ** Multivariate Regression and Regression through the origin**
+5. **Multivariate Regression and Regression through the origin**
 	+ Basic Multivariate Regression models
 	+ Regression threough the Origin 
 	+ Using datasets such as swiss, Insectsprays 
@@ -35,7 +35,11 @@
 	+ Case:1 - Strong marginal effect (ie, change in the intercept), when x or the regressor is discarded  and very less effect when x is included 
 	+ Case:2 - less marginal effect (ie, change in the intercept), when x or the regressor is discarded  and very high effect when x is included 
 	+ Case:3 - x is such that there is no overlap in the above two cases , and there will be cases when there will be ovelap occuring
-	* Simpsons Paradox - Simpson’s paradox refers to a phenomena whereby the association between a pair of variables
+	+ Case:4 - x is such that there is no marginal effect when we ignore x  , and there is a huge effect when we adjusted for x and we include x
+	+ Case:5 - For this case there is no common slope, case where there are different intercepts and different slopes- For this case there is no Treatment effect and the treatment effect depends on what level of x we are at .
+		- You will need a interaction term in the model , for this case , and also common slopes will not be there
+	+ More the number of variables , it is better to do residual analysis in that case 	
+	+ **Simpsons Paradox** - Simpson’s paradox refers to a phenomena whereby the association between a pair of variables
 		(X, Y ) reverses sign upon conditioning of a third variable, Z, regardless of the value taken
 		by Z. 
 		- You look at a variable as it relates to an outcome and that affect reverses itself with the inclusion of another variable (regressor)
