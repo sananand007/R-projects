@@ -44,3 +44,6 @@
 		by Z. 
 		- You look at a variable as it relates to an outcome and that affect reverses itself with the inclusion of another variable (regressor)
 		- Things can change to the exact opposite if you perform adjustment
+7. **P-value & Hypothesis Testing**
+	+ Null Hypothesis is always the case you say that a Response is not dependent on a Predictor, hence you consider the case when the p-value is low or otherwise lower than 0.05, that says that the predictor/Regressor is significant and there is enough evidence that the Null hypothesis can be rejected
+	
