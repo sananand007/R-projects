@@ -46,4 +46,15 @@
 		- Things can change to the exact opposite if you perform adjustment
 7. **P-value & Hypothesis Testing**
 	+ Null Hypothesis is always the case you say that a Response is not dependent on a Predictor, hence you consider the case when the p-value is low or otherwise lower than 0.05, that says that the predictor/Regressor is significant and there is enough evidence that the Null hypothesis can be rejected
-	
+
+8. **GLM - Generalized Lnear Models**
+	• An exponential family model for the response 
+	• A systematic component via a linear predictor
+	• A link function that connects the means of the response to the linear predictor
+
+	### Other properties : 
+	- Used Generalized Estimation equation 
+	- Predictors are linear but link function is non linear
+	- Allows response variables to take any form of exponential distribution
+	- Handles non-normality effectively (logit, probit/inverse Logit, LogLinear)
+	- Handles high correlation, which OLS and MLE fail to do
