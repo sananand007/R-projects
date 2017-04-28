@@ -1,0 +1,104 @@
+---
+title: "Regression Models Course Project"
+author: "Sandeep Anand"
+date: "April 23, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, highlight=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Executive Summary 
+##Analysis for *Motor Trend* and Showing the dependence of MPG on specific covariates
+###Two Important analysis that needs to be done are below
+  - Is an automatic or manual transmission better for MPG
+  - Quantify the MPG difference between automatic and manual transmissions
+
+### Step-1
+  - Finding the Coefficients
+  - Determining which transmission has better MPG
+  - Comparing the Means of both the transmissions below
+  - t-test to check the p-value and the means as well
+```{r Coef, background="grey", echo=FALSE}
+library(ggplot2)
+data("mtcars")
+# Get the means of the two cases of Auto and manual shifts
+Transmission<-c("Automatic", "Manual")
+meanval<-c(mean(mtcars$mpg[mtcars$am==0]),mean(mtcars$mpg[mtcars$am==1]))
+df = data.frame(Transmission,meanval)
+df
+p<-ggplot(mtcars, aes(am, mpg))
+p<-p+geom_boxplot(aes(colour = factor(am)))
+p<-p+geom_hline(yintercept = meanval[1], colour="#990000", linetype="dashed")
+p<-p+geom_hline(yintercept = meanval[2],colour="#110000", linetype="dashed")
+p<-p+xlab("Transmission type(0=auto, 1=manual)")
+## Doing a t test to confirm the results
+auto<-mtcars[mtcars$am == 0,]
+manual<-mtcars[mtcars$am == 1,]
+t.test(auto$mpg,manual$mpg)
+p
+```
+
+## Result-1
+ - The Box-plot shows that the mean of mpg for manual transmission cars are better than auto transmissions
+ - The t test result also shows that , p value = 0.0013 , ie < 0.05 , so we can reject the Null Hypothesis and hence Automatic Transmission shows lower MPG than manual transmissions, though there are other covariates that we would need to see if they have any particular relation in deacrease in the mpg . 
+
+## Now analyzing this based on different Models we can fit . 
+
+### 1st Model Fit
+
+  - **Fitting A linear Model with response as MPG and Factoring the am variable**
+  
+### Trying Fitting Linear Model here  
+```{r linear, echo=TRUE}
+fitlm<-lm(mpg~factor(am)-1,data = mtcars)
+summary(fitlm)
+```
+## Conclusions from the Linear Model Fit 
+  - Both the Transmission values seem to be important and significant 
+  - Mean that are the coefficients reflect the fact that the response mpg is more dependent on am=1 , ie, Manual transmission 
+  - The Above is a multivariate analysis where we consider both factors am=0 and am=1
+  - $$R^2 = -.95$$ ie, "Goodness of Fit", so it seems that 95% of the variance of my response ie, mpg is explained by my model , but is that actually true ? 
+    + To answer the above question we would need to feed in other covariates and check
+    
+## 2nd Model Fit
+  - **Fitting A Multivariate linear Model with response as MPG and all the other covariates present**
+  - **Fitting A Multivariate linear Model with response as MPG and specific dependent covariates present**
+### Conclusions from the plots below :
+  - Seems this model is following normality with most of the points for the Residuals
+  - The Slope Coefficients of the factored am[0,1] show the high dependence of "mpg" on Transmission modes
+  - From the Plot-2, it is clear the autocorreclation plot show no obvious trend of failure, and fitted values vs. Residuals appear quite random
+  - From the Best Fitting model with covariates weight, horsepower and Transmission mode, It is clear than there is high dependence of mpg on am.
+  - With a Very low p-value for the best fit model, we can reject the Null Hypothesis 
+  - The below model with high R^2 value explain most of the variance
+ **Summaried of Two Multivariate models compared** 
+```{r multivariate reg,echo=FALSE}
+fitmlm<-lm(mpg~.+factor(am)-am-1,data = mtcars)
+summary(fitmlm)$call
+summary(fitmlm)$coef
+summary(fitmlm)$r.squared
+#Best-Fit
+fitmlmbestfit<-lm(mpg~am+wt+hp,data = mtcars)
+summary(fitmlmbestfit)$call
+summary(fitmlmbestfit)$coef
+summary(fitmlmbestfit)$r.squared
+```
+
+# Appendix
+**plot-1**
+```{r mulivariate lm,echo=FALSE, fig.height=5,fig.width=6}
+library(ggfortify)
+autoplot(fitmlm, label.size=3)+theme_bw()
+```
+
+**plot-2**    
+```{r plot2, echo=FALSE, fig.height=5,fig.width=6}
+par(mfrow=c(1,3))   #Make a new 1-by-3 plot
+plot(residuals(fitmlm))
+title("Residual Plot")
+acf(residuals(fitmlm), main = "")
+title("Residual Autocorrelation Plot")
+plot(fitted(fitmlm), residuals(fitmlm))
+title("Residual vs Fit. value")
+```

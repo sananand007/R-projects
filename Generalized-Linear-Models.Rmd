@@ -1,0 +1,80 @@
+---
+title: "GLM - Generalized Linear Models"
+author: "Sandeep Anand"
+date: "April 22, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Generalized Linear Models
+
+  - We will use logistic regression as below when we would consider a Binomial outcome
+  - On the Logit scale you would like to see if the coefficient is close to 0 or not , on the exponential scale that should be 1
+
+```{r Ravens Logistic Regression}
+#path = getwd()
+#path_for_file = paste(path, "/RavensData/",sep="")
+#dir.create(path_for_file)
+#-- download.file() not working , pleae chek
+#download.file("https://dl.dropbox.com/u/7710864/data/ravensData.rda",destfile="./RavensData/ravensData.rda",method="curl")
+load("./RavensData/ravensData.rda")
+head(ravensData)
+logRegRavens<-glm(ravensData$ravenWin ~ ravensData$ravenScore, family = "binomial")
+summary(logRegRavens)
+```
+
+## Fitten Curves  
+  * Only a part of the S curve is shown below
+  * Component of the S curve where the data is present was restricted 
+  * Took the X values , multiplied it with the coefficients , added the intercept to it and then got the ratio of exp(val)/(1+exp(val)) and that is the probability ie, on the Y       asis
+  * equation block:
+  $$P_r= \frac{\mathrm{e}^{p}}{(1+\mathrm{e}^{p})}$$
+
+```{r FItted Curve, echo=FALSE}
+plot(ravensData$ravenScore, logRegRavens$fitted, pch=19, col="blue", xlab = "Score", ylab = "Prob Ravens Win")
+```
+
+## Understanding the coefficients
+  * 11% increase in the probability of winning of every point that the ravens score
+
+### Sometool like Anova is very useful in porting a factor variable in and out of a model , when there a number of factor variables available
+
+```{r exponents, echo=TRUE}
+exp(logRegRavens$coeff)
+exp(confint(logRegRavens))
+anova(logRegRavens, test="Chisq")
+```
+
+## Interpreting Odds Ratios
+
+  - Not probabilities
+  - Odds ratio of 1 = no difference in odds
+  - Log odds ratio of 0 = no difference in odds
+  - Odds ratio < 0.5 or > 2 commonly a "moderate effect"
+  - Relative risk $\frac{\rm{Pr}(RW_i | RS_i = 10)}{\rm{Pr}(RW_i | RS_i = 0)}$ often easier to interpret, harder to estimate
+  - For small probabilities RR $\approx$ OR but they are not the same!
+  
+## Modelling Count Data - Poisson Distribution
+
+  - Poisson Distribution is useful model for counts and rates
+  - Modelling web traffic rates
+  - Contigency tables data
+  - Poisson Distribution becomes very much like a normal distributin as $$t\lambda$$, increases
+  - Mean and Variance of a Poisson Distribution are equal
+  - We are going to assume that our data is poisson distributed with a mean and that mean takes this form - difference between Linear Model
+  - Everything is log() , we log the mean of the Outcome, and this is considered as one of the best transformations we can do 
+  - Slope coeff. is the relative increase or decrease in the mean per one unit chage in the regressor.
+  - For these type of modelling it is important that variance also increases with variance , and that can be checked using a Residual vs. Fitted curve 
+  - Also This can be achieved by the use of quasi-poisson models, to hold the right trend
+  - Check the use ofsandwich variance estimator, made famous by generalized estimating equations
+  - One problem that happens a lot with poisson distribution is when 0's occur a lot , and that is called 0 inflation, there are packages for handling zero inflation
+  
+```{r Poisson Distribution, echo=TRUE}
+par(mfrow=c(1,3))
+plot(0:10, dpois(0:10, lambda = 2), type = "h", frame.plot = TRUE)
+plot(0:20, dpois(0:20, lambda = 10), type = "h", frame.plot = TRUE)
+plot(0:300, dpois(0:300, lambda = 100), type = "h", frame.plot = TRUE)
+```
