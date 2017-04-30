@@ -45,16 +45,16 @@
 		- You look at a variable as it relates to an outcome and that affect reverses itself with the inclusion of another variable (regressor)
 		- Things can change to the exact opposite if you perform adjustment
 		### Influential measures and influential outliers , Influence.measures | Residuals , Diagnostics & Variations
-			- When a sample is included in a model, it pulls the regression line closer to itself (orange line) than that of the model which excludes it (black line.) 
-			- Its residual, the difference between its actual y value and that of a regression line, is thus smaller in magnitude when it is included (orange dots) than when it is omitted (black dots.) 
-			- The ratio of these two residuals, orange to black, is therefore small in magnitude for an influential sample. For a sample which is not influential the ratio would be close to 1. 
-			- Hence, 1 minus the ratio is a measure of influence, near 0 for points which are not influential, and near 1 for points which are. This measure is called **influence or leverage or hatvalue**
-			- **rstandard**: The function, rstandard, computes the standardized residual
-			-**rstudent**: The function, rstudent, calculates Studentized residuals for each sample
-			-**Cook's distance** is the last influence measure we will consider. It is essentially the sum of squared differences between values fitted with and without a particular sample. 
-			- It is normalized (divided by) residual sample variance times the number of predictors which is 2 in our case (the intercept and x.)
-			- It essentially tells how much a given sample changes a model
-			- **cooks.distance**: The function, cooks.distance, will calculate Cook's distance for each sample
+		- When a sample is included in a model, it pulls the regression line closer to itself (orange line) than that of the model which excludes it (black line.) 
+		- Its residual, the difference between its actual y value and that of a regression line, is thus smaller in magnitude when it is included (orange dots) than when it is omitted (black dots.) 
+		- The ratio of these two residuals, orange to black, is therefore small in magnitude for an influential sample. For a sample which is not influential the ratio would be close to 1. 
+		- Hence, 1 minus the ratio is a measure of influence, near 0 for points which are not influential, and near 1 for points which are. This measure is called **influence or leverage or hatvalue**
+		- **rstandard**: The function, rstandard, computes the standardized residual
+		- **rstudent**: The function, rstudent, calculates Studentized residuals for each sample
+		- **Cook's distance** is the last influence measure we will consider. It is essentially the sum of squared differences between values fitted with and without a particular sample. 
+		- It is normalized (divided by) residual sample variance times the number of predictors which is 2 in our case (the intercept and x.)
+		- It essentially tells how much a given sample changes a model
+		- **cooks.distance**: The function, cooks.distance, will calculate Cook's distance for each sample
 7. **P-value & Hypothesis Testing**
 	+ Null Hypothesis is always the case you say that a Response is not dependent on a Predictor, hence you consider the case when the p-value is low or otherwise lower than 0.05, that says that the predictor/Regressor is significant and there is enough evidence that the Null hypothesis can be rejected
 
