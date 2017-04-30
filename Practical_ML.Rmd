@@ -1,0 +1,55 @@
+---
+title: "Practical Machine Learning"
+author: "Sandeep Anand"
+date: "April 30, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, highlight=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Practical Machine Learning
+- **Plotting the mails which have capital letter**
+```{r In Sample and Out of Sample Errors,echo=TRUE}
+library(kernlab);data(spam);set.seed(333)
+smallspam<-spam[sample(dim(spam)[1], size = 10),]
+spamLabel<-(smallspam$type=="spam")*1+1
+plot(smallspam$capitalAve, col=spamLabel)
+
+#Functions to apply Rules to the spam data
+rule1<-function(x)
+{
+  prediction<-rep(NA, length(x))
+  prediction[x>2.7]<-"spam"
+  prediction[x<2.40]<-"nonspam"
+  prediction[x>=2.40 & x<=2.45]<-"spam"
+  prediction[x>=2.45 & x<=2.70]<-"nonspam"
+  return(prediction)
+}
+rule2<-function(x)
+{
+  prediction<-rep(NA, length(x))
+  prediction[x>2.40]<-"spam"
+  prediction[x<=2.40]<-"nonspam"
+  return(prediction)
+}
+
+table(rule1(smallspam$capitalAve), smallspam$type)
+table(rule2(smallspam$capitalAve), smallspam$type)
+```
+
+## Applying the above rule functions to all the spam data 
+  - Checking how our rules fit and what are the errors seen 
+  - The diagonal elements provide us with the errors
+  - Looking at accuracy as well , checking the number of times we are correct for both our rules
+  - Overfitting -  'Overfitting' A modeling error which occurs when a function is too closely fit to a limited set of data points. Overfitting the model generally takes the form of making an overly complex model to explain idiosyncrasies in the data under study.
+```{r applying rules to whole SPAM data, echo=TRUE}
+table(rule1(spam$capitalAve), spam$type)
+
+table(rule2(spam$capitalAve), spam$type)
+
+sum(rule1(spam$capitalAve)==spam$type)
+
+sum(rule2(spam$capitalAve)==spam$type)
+```

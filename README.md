@@ -117,4 +117,35 @@
 		+ Out-of-Sample error - The error rate that you get on a new data set , Generalization error
 		+ Insample error < out-of-sample-error
 		+ Overfitting - Only matching your data very closely and will not match the other data that you have 
+	- **Prediction study Design**
+		+ Define your error rate 
+		+ Split data into: 
+			- Traning Set
+			- Test Set
+			- Validation Set
+		+ On Training set pick features
+			- Use cross-validation, What is cross-validation?
+		+ If no validation
+			- apply 1x to test set
+		+ If validation
+			- Apply to test set to refine and change the model to have a better fit
+			- Get the test set error 
+			- Apply 1x to the validation set  and that will give a good estimate of the out of sample error rate
+		+ Hold one data set and keep it completely aside to run on your model to make sure how your model fits this and you can only apply you model on this data set only one time
+		+ Avoid small sample sizes, so that we are not getting good prediction accuracy by chance
+		+ Rules of Thumb
+			- If there is a Large sample size
+				+ 60% training
+				+ 20% test
+				+ 20% validation
+			- If you have a medium sample size
+				+ 60% training
+				+ 40% test
+			- If you have a small sample size
+				+ Do cross-validation
+				+ report the caveat of small size
+			- Set aside test set and validation set and do not look at it when building a model, only 1 time this should be applied to your model at the end only
+			- backtesting - mostly apply in finance kind of datasets , datasets consists of observations over time, split train/test in time chunks
+			- All subsets should reflect as much diversity as possible
+			
 	
