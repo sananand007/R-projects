@@ -90,3 +90,31 @@
 	- Find out the p-value to weather we can reject the Null Hypothesis that a particular covariate is insignificant
 	- Finding R^2 to check the "goodness of fit" and seeing how much of the variance we can explain here
 	- Finding the Autocorellation function graph as well to check the residuals Vs. Fitted values
+	
+11. **Practical Machine Learning**
+	- Uses in different fields like Biomedical and prediction 
+	- Use of the R caret package
+	- Presence of Materials for ML 
+		+ The Elements of Statistical learning
+		+ Stanford - ML course By Andrew Ng
+		+ Kaggle Competitions
+		+ https://www.quora.com/What-is-the-best-MOOC-to-get-started-in-Machine-Learning/answer/Xavier-Amatriain
+		+ https://www.quora.com/Machine-Learning/How-do-I-learn-machine-learning-1
+		+ http://www.sciencemag.org/site/feature/data/compsci/machine_learning.xhtml
+		+ https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-867-machine-learning-fall-2006/lecture-notes/
+		+ https://ocw.mit.edu/courses/find-by-topic/#cat=engineering&subcat=computerscience&spec=artificialintelligence
+		+ http://www.stat.cmu.edu/~cshalizi/350/
+		+https://www.kaggle.com/
+		+ Notes on CMU - 36-705 | 10-715 | 
+			- http://www.stat.cmu.edu/~larry/=stat705/
+			- http://www.cs.cmu.edu/~epxing/Class/10701/lecture.html
+			- Statistical ML [Larry Wesserman] - Spring 2016: Statistical Machine Learning (10-702/36-702)
+	- Components of a Predictor
+		+ question -> input data -> features -> algorithm -> parameters -> evaluation
+	- Logistic Regression and Linear Kernel SVMs, PCA vs. Matrix Factorization, regularization, or gradient descent
+	- In Sample vs Out of Sample
+		+ In-Sample error - The error that you get on the same data that you used to build your predictor
+		+ Out-of-Sample error - The error rate that you get on a new data set , Generalization error
+		+ Insample error < out-of-sample-error
+		+ Overfitting - Only matching your data very closely and will not match the other data that you have 
+	
