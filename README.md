@@ -147,5 +147,18 @@
 			- Set aside test set and validation set and do not look at it when building a model, only 1 time this should be applied to your model at the end only
 			- backtesting - mostly apply in finance kind of datasets , datasets consists of observations over time, split train/test in time chunks
 			- All subsets should reflect as much diversity as possible
+	- **Types of errors**
+		- Postive = Identified | negative = rejected 
+			+ True Positive = correctly identified
+			+ False Positive = incorrectly identified
+			+ True Negative = correctly rejected
+			+ False Positive = incorrectly rejected
+		- Statistical definitions : https://en.wikipedia.org/wiki/Sensitivity_and_specificity
+			+ Sensitivity and specificity are statistical measures of the performance of a binary classification test, also known in statistics as classification function:
+			+ Sensitivity (also called the true positive rate, the recall, or probability of detection[1] in some fields) measures the proportion of positives that are correctly identified as such (i.e. the percentage of sick people who are correctly identified as having the condition).
+			+ Specificity (also called the true negative rate) measures the proportion of negatives that are correctly identified as such (i.e., the percentage of healthy people who are correctly identified as not having the condition).
+		- Very important to know what population you are modelling from
+		- Common Error Measure : For continous data we generally check the MSE and the RMSE, Median Absolute deviation
+		- ROC curves
 			
 	
