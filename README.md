@@ -216,5 +216,6 @@
 		- Skewed variables
 		- Standardization -> negating the mean and dividing by the standard deviation
 		- Any formulas or values that we apply to the test set have to be got from the training set
+		- Test-1
 			
 	
