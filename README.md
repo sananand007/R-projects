@@ -118,7 +118,8 @@
 		+ Insample error < out-of-sample-error
 		+ Overfitting - Only matching your data very closely and will not match the other data that you have 
 	- **Prediction study Design**
-		+ Define your error rate 
+		+ Define your error rate
+		+ Use Like Data to predict like	
 		+ Split data into: 
 			- Traning Set
 			- Test Set
@@ -159,6 +160,61 @@
 			+ Specificity (also called the true negative rate) measures the proportion of negatives that are correctly identified as such (i.e., the percentage of healthy people who are correctly identified as not having the condition).
 		- Very important to know what population you are modelling from
 		- Common Error Measure : For continous data we generally check the MSE and the RMSE, Median Absolute deviation
-		- ROC curves
+		- ROC curves - Receiver operating characteristic curves ie, you plot the Sensitivity Vs. Specificity
+			+ Higher the area, better the predictor is
+			+ The 45 degree line is  the point where we have the Probablity of 0.5
+			+ The further you are to the upper left hand corner of the square/pltot, the better the ROC is, and the closer you are to the right hand corner of the plot 
+			the , poorer the ROC is 
+	- Cross Validation
+		- Use the Training Set
+		- Split it into training/test sets
+		- Build the model on the training set
+		- Evaluate on the test set
+		- Repeat and average the estimated errors
+		- Different types of cross validation techniques to estimate the Out of Sample accuracy/error rate
+			+ Random Subsampling
+				- without replacement
+				- with replacement - bootstrap --> learnt this technique earlier, take a look into it
+					- Underestimates the error , as some of the samples are considered more than once
+					- Any of the models can be built by using the caret package in R
+			+ K-fold 
+				* Larger K = less bias, more variance
+				* smaller K = more bias, less variance
+			+ Leave one Out 
+	- Caret Package
+		- Cleaning
+		- Data splitting
+		- Training/Testing functions
+		- Model Comparision [confusion matrix]
+		- http://www.edii.uclm.es/~useR-2013/Tutorials/kuhn/user_caret_2up.pdf
+		- https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf
+		- file:///C:/Users/sanan/Downloads/v28i05.pdf
+		- Data Splicing 
+		- time Splicing
+		- Train options
+			+ RMSE [Root mean square error]
+			+ RSquared = R^2 - Coefficient of Determination, it suggers how close your model fits the original data
+			+ Adjusted RSquared - The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model
+			+ Accuracy - Fraction correct
+			+ Kappa - measure of concordance
+			+ Usage of trainControl 
+			+ Caret tutorial 
+			+ Model training and tuning - http://topepo.github.io/caret/model-training-and-tuning.html
+	- Machine Learning Algorithms [Try to simulate a ML Algorithm on your own that using Libraries]
+		- Linear Discriminant analysis
+		- regression
+		- Naive Bayes
+		- SVM [Support vector machines]
+		- Classification to regression trees
+		- Random Forests
+		- Boosting
+	- Plotting predictors
+		- Make your plots only on the training set and not use the test set at all
+		- Look for imbalance in outcomes/predictors 
+		- Outliers
+		- Groups of points not explained by the predictors 
+		- Skewed variables
+		- Standardization -> negating the mean and dividing by the standard deviation
+		- Any formulas or values that we apply to the test set have to be got from the training set
 			
 	
