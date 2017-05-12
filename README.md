@@ -194,6 +194,10 @@
 		- Train options
 			+ RMSE [Root mean square error]
 			+ RSquared = R^2 - Coefficient of Determination, it suggers how close your model fits the original data
+			+ **Coeffient of Determination** = what % of the total variation is not explained by the variation in x or by the regression Linear
+				- formula of Ratio [not described by the line] = $$\frac{SE_{line}}{SE_{y}}
+				- % of total variation is described by the variation in x = $$R^2 = 1 \m \frac{SE_{line}}{SE_{y}}$$
+				- If the $$SE_{line}$$ is small , that means the line is a good fit , hence the $$R^2$$ will be close to 1 , hence Line is not a good fit
 			+ Adjusted RSquared - The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model
 			+ Accuracy - Fraction correct
 			+ Kappa - measure of concordance
