@@ -258,30 +258,30 @@
 				- Find a new set of multivariate variables that are uncorrelated and find as much variance as possible
 				- if you put all the variables together in one matrix , find the best matrix created with fewer variables , ie . Lower rank that explain the whole of the data
 	- **SVD - Singular value decomposition**
-			+ wiki : https://en.wikipedia.org/wiki/Singular_value_decomposition
-			+ Take a look at the MIT lecture : 
-			+ Take a look at the pdf : https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf
-			+ equation : **A = UDV*** , where A is a mxn real matrix, with m>n, then A can be written as a so called SVD 
-				- U is a left singular vector ie, orthogonal
-				- V is a right singular vector ie, orthogonal
-				- D is a diaginal matrix
+		+ wiki : https://en.wikipedia.org/wiki/Singular_value_decomposition
+		+ Take a look at the MIT lecture : 
+		+ Take a look at the pdf : https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf
+		+ equation : **A = UDV*** , where A is a mxn real matrix, with m>n, then A can be written as a so called SVD 
+			- U is a left singular vector ie, orthogonal
+			- V is a right singular vector ie, orthogonal
+			- D is a diaginal matrix
 	- **PCA - Principal Component analysis**
-			+ It can reduce the number of quantitative variables present
-			+ Check PCA from **Elements of Statistical Learning**
-			+ Some books
-				- Modern applied statistics with S
-				- introduction to statistical learning
+		+ It can reduce the number of quantitative variables present
+		+ Check PCA from **Elements of Statistical Learning**
+		+ Some books
+			- Modern applied statistics with S
+			- introduction to statistical learning
 	**Splitting into Decision Trees**
-			+ Interatively split variables into groups
-			+ Basic Algorithm	of decision trees - https://en.wikipedia.org/wiki/Decision_tree_learning
-				- Start with Variables in one groups
-				- Find the variable/split that best describes the outcomes 
-				- Divide the data into two groups ("leaves") on that split ("node")
-				- Within each split , find the best variable/split that separates the outcomes
-				- continue till the groups are sufficiently pure or homogenous
-				- Classification trees are non-linear models 
-				- They use interactions between variables
-				- There are multiple tree building options in R , such as : rpart , party, tree -> all are tree packages 
-				- Book : https://www.amazon.com/Classification-Regression-Trees-Leo-Breiman/dp/0412048418
+		+ Interatively split variables into groups
+		+ Basic Algorithm	of decision trees - https://en.wikipedia.org/wiki/Decision_tree_learning
+			- Start with Variables in one groups
+			- Find the variable/split that best describes the outcomes 
+			- Divide the data into two groups ("leaves") on that split ("node")
+			- Within each split , find the best variable/split that separates the outcomes
+			- continue till the groups are sufficiently pure or homogenous
+			- Classification trees are non-linear models 
+			- They use interactions between variables
+			- There are multiple tree building options in R , such as : rpart , party, tree -> all are tree packages 
+			- Book : https://www.amazon.com/Classification-Regression-Trees-Leo-Breiman/dp/0412048418
 			
 	
