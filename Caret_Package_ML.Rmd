@@ -1,0 +1,278 @@
+---
+title: "Caret_Package_users"
+author: "Sandeep Anand"
+date: "May 7, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, highlight=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+## Caret Package and Its uses
+
+```{r caret example, echo=TRUE, eval=TRUE}
+library(caret);library(kernlab); data(spam)
+
+#Breaking the data into train and test set , 75% is allocated to the training set and 25% is allocated to the test set
+inTrain <- createDataPartition(y=spam$type, p=0.75, list=FALSE)
+
+training<-spam[inTrain,]
+testing<-spam[-inTrain,]
+
+dim(training)
+
+# Now we train 
+set.seed(32343)
+modelFit<-train(type~., data = training, method="glm")
+modelFit$finalModel
+
+# Prediction using the ModelFit object that we got
+predictions<-predict(modelFit, newdata=testing)
+#predictions
+
+
+#Confusion Matrix to see how good is your predictions here
+confusionMatrix(predictions, testing$type)
+
+```
+
+# Data slicing
+
+- Use cross validation to split the dataset into k  folds with samples in them
+
+```{r data slicing, echo=TRUE, eval=FALSE}
+
+#slicing based on K Fold, using cross-validation 
+
+set.seed(32323)
+folds <- createFolds(y=spam$type, k=10, list = TRUE, returnTrain = TRUE)
+sapply(folds, length)
+
+folds[[1]][1:10]
+
+# Return test
+folds<-createFolds(y=spam$type, k=10, list=TRUE, returnTrain = FALSE)
+sapply(folds,length)
+
+folds[[1]][1:10]
+
+# Resampling with relplacement
+folds<-createResample(y=spam$type, times = 10, list = TRUE)
+sapply(folds, length)
+folds[[1]][1:10]
+
+```
+
+# Train options
+- Use the train functions and it will choose the default values for you 
+- only you would need to change the method ie, Fit
+- trainControl function
+- Chanding the seed to generating the same kind of Random numbers that will be generated , so the data that will be generated when you rerun the code
+
+```{r Train options, echo=TRUE}
+args(trainControl)
+```
+
+# Wage Data and plotting predictors
+
+```{r Wagedata, echo=TRUE, eval=FALSE}
+library(ISLR); library(ggplot2); library(caret);
+data(Wage)
+summary(Wage)
+
+inTrain1<-createDataPartition(y=Wage$wage, p=0.7, list=FALSE)
+training <- Wage[inTrain1,]
+testing <- Wage[-inTrain1,]
+
+dim(training); dim(testing)
+
+featurePlot(x=training[, c("age", "education", "jobclass")], y=training$wage, plot = "pairs")
+
+library(ggplot2)
+qplot(age, wage, colour=jobclass, data = training)
+
+
+qq<-qplot(age, wage, colour=education, data=training)
+qq+geom_smooth(method='lm', formula = y~x)
+
+
+#Density Plots
+qplot(wage, colour=education, data = training, geom = "density")
+```
+
+# Preprocessing Data
+
+- Standardization 
+
+```{r preProcess, echo=TRUE, eval=FALSE}
+library(caret); library(kernlab); data(spam)
+inTrain<-createDataPartition(y=spam$type, p=0.75, list = FALSE)
+
+training_new<-spam[inTrain,]
+testing_new<-spam[-inTrain,]
+
+#Standarizing
+# The Training set
+trainCapAve <- training_new$capitalAve
+trainCapAveS <- (trainCapAve - mean(trainCapAve))/sd(trainCapAve)
+mean(trainCapAveS)
+
+# Standardizing the test set here
+# while doing this it is not necessary that the mean of the test set will be 0, nor will be the standard deviation be 1
+
+testCapAve <- testing_new$capitalAve
+testCapAveS <- (testCapAve-mean(trainCapAve))/sd(trainCapAve)
+mean(testCapAveS)
+
+```
+
+### Standardizing using a "Box-Cox" transform
+
+- After using the preProcess() function we can see that there is a histogram that looks more like a normal function
+- This is a continous transform and does not take care of the values that are repeated
+
+```{r uisng Preprocessing, echo=TRUE}
+library(caret); library(kernlab); data(spam)
+
+inTrain<-createDataPartition(y=spam$type, p=0.75, list = FALSE)
+training_new<-spam[inTrain,]
+testing_new<-spam[inTrain,]
+
+
+preobj<-preProcess(training_new[,-58], method=c("center","scale"))
+trainCapAveS<-predict(preobj, training_new[,-58])$capitalAve
+mean(trainCapAveS)
+sd(trainCapAveS)
+
+# Use the preobj to predict the test 
+testCapAveS<-predict(preobj, testing_new[,-58])$capitalAve
+mean(testCapAveS)
+sd(testCapAveS)
+
+# Standardizing preprocess argument as well using the train function
+# Using box-cox transforms, -58 is so that you take out the outcome
+preObj_1<-preProcess(training_new[,-58], method=("BoxCox"))
+trainCapAveS<-predict(preObj_1, training_new[,-58])$capitalAve
+par(mfrow=c(1,2)); hist(trainCapAveS); qqnorm(trainCapAveS)
+```
+
+
+### Imputing data using KNN imputations
+
+- Predicting algorithms do not perform well in the presence of "NA" values
+
+```{r imputing data, echo=TRUE}
+set.seed(13343)
+
+#Make some value NA to demonstrate
+training$capAve<-training$capitalAve
+selectNA<-rbinom(dim(training)[1],size = 1, prob = 0.05)==1
+training$capAve[selectNA]<-NA
+
+#Impute and standardize
+preobj_2<-preProcess(training[,-58], method = "knnImpute")
+capAve<-predict(preobj_2, training[,-58])$capAve
+
+#standardize those values
+capAveTruth<-training$capitalAve
+capAveTruth<-(capAveTruth-mean(capAveTruth))/sd(capAveTruth)
+
+quantile(capAve-capAveTruth)
+quantile((capAve-capAveTruth)[selectNA])
+quantile((capAve-capAveTruth)[!selectNA])
+```
+
+### Covariate Creation
+  - Using Covariates or featues
+  - raw data can take the form of a image or a text file
+  - Transforming tidy covariates
+  - Raw Data depends heavily on applications
+  - Balancing act is the summurization vs. information Loss
+  - Text files 
+    + frequency of words
+    + frequency of phrases
+    + frequency of capital letters
+  - Webpages
+    + A/B testing [types of images , position of elements]
+  - Images
+    + Edges, corners, blobs, ridges [face detection mostly]
+  - People
+    + Height, weight, color, sex and origin
+  - Tidy Covariates
+
+```{r covariate, echo=TRUE}
+library(spam);library(kernlab)
+spam$capitalAvesq<-spam$capitalAve^2
+
+library(ISLR); library(ggplot2); library(caret);
+data(Wage)
+summary(Wage)
+
+inTrain1<-createDataPartition(y=Wage$wage, p=0.7, list=FALSE)
+training <- Wage[inTrain1,]
+testing <- Wage[-inTrain1,]
+
+table(training$jobclass)
+dummies<-dummyVars(wage~jobclass, data = training)
+head(predict(dummies, newdata=training))
+
+#Removing zero covariates
+nsv<-nearZeroVar(training,saveMetrics = TRUE)
+nsv
+
+#Fitting curves with Splines
+library(splines)
+bsBasis<-bs(training$age, df=3)
+bsBasis
+
+lm1<-lm(wage~bsBasis, data = training)
+plot(training$age, training$wage, pch=19, cex=0.5)
+points(training$age, predict(lm, newdata=training), col="red", pch=19, cex=0.5)
+
+# splines on the test set
+predict(bsBasis, age=testing$age)
+
+```
+
+
+# PML , Question-1
+
+```{r Question-1, echo=TRUE, eval=FALSE}
+library(AppliedPredictiveModeling)
+data(AlzheimerDisease)
+
+adData = data.frame(diagnosis,predictors)
+trainIndex = createDataPartition(diagnosis, p = 0.50,list=FALSE)
+training = adData[trainIndex,]
+testing = adData[-trainIndex,]
+
+dim(training); dim(testing)
+
+```
+
+
+# PML , Question-2
+
+```{r Question-2, echo=TRUE, eval=FALSE}
+library(AppliedPredictiveModeling)
+data(concrete)
+
+library(caret)
+
+set.seed(1000)
+
+inTrain = createDataPartition(mixtures$CompressiveStrength, p = 3/4)[[1]]
+training = mixtures[intrain, ]
+testing = mixtures[-intrain, ]
+
+
+library(dplyr); library(Hmisc); library()
+qq<-qplot()
+
+```

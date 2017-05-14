@@ -181,7 +181,7 @@
 				* Larger K = less bias, more variance
 				* smaller K = more bias, less variance
 			+ Leave one Out 
-	- Caret Package
+	- Caret Package - http://topepo.github.io/caret/
 		- Cleaning
 		- Data splitting
 		- Training/Testing functions
@@ -195,7 +195,7 @@
 			+ RMSE [Root mean square error]
 			+ RSquared = R^2 - Coefficient of Determination, it suggers how close your model fits the original data
 			+ **Coeffient of Determination** = what % of the total variation is not explained by the variation in x or by the regression Linear
-				- formula of Ratio [not described by the line] = $$\frac{SE_{line}}{SE_{y}}
+				- formula of Ratio [not described by the line] = $$\frac{SE_{line}}{SE_{y}}$$
 				- % of total variation is described by the variation in x = $$R^2 = 1 \m \frac{SE_{line}}{SE_{y}}$$
 				- If the $$SE_{line}$$ is small , that means the line is a good fit , hence the $$R^2$$ will be close to 1 , hence Line is not a good fit
 			+ Adjusted RSquared - The adjusted R-squared is a modified version of R-squared that has been adjusted for the number of predictors in the model
@@ -221,5 +221,55 @@
 		- Standardization -> negating the mean and dividing by the standard deviation
 		- Any formulas or values that we apply to the test set have to be got from the training set
 		- Test-1
+	### Covariate Creation
+		- Using Covariates or featues
+		- raw data can take the form of a image or a text file
+		- Transforming tidy covariates
+		- Raw Data depends heavily on applications
+		- Balancing act is the summurization vs. information Loss
+		- Text files 
+			+ frequency of words
+			+ frequency of phrases
+			+ frequency of capital letters
+		- Webpages
+			+ A/B testing [types of images , position of elements]
+		- Images
+			+ Edges, corners, blobs, ridges [face detection mostly]
+		- People
+			+ Height, weight, color, sex and origin
+		- Tidy Covariates
+			+ More necessary on regression,svm's than for others ie, Classification trees
+			+ Should be done **only on the training set**
+			+ Generally we should spend more time on exploratory data analysis
+			+ New Covariates should be added to data frames
+			+ Turn covariates which are factor variables into dummy variables/indicator variables
+				- Better to turn these qualitative variables into quantitative variables as it is difficult to implement any algorithms as such
+			+ Removing zero covariates , since all the predictors are not necessary to be unique and useful 
+			+ Curvy model fitting using **splines** package
+			+ We would have to create the covariates on the test data set using the same procedure that was used on the training set 
+			+ Deeplearning tutorial and creation of features : http://www.cs.nyu.edu/~yann/talks/lecun-ranzato-icml2013.pdf
+		- Level-1 feature creation : raw data to covariates
+		- Level-2 feature creation : covariates to new covariates 
+			+ using the caret package , preprocess() function: http://topepo.github.io/caret/pre-processing.html
+		- Preprocessing using PCA	
+			+ All operation and model building has to happen in the training set only
+			+ The idea is to "capture as much information" as possible
+			+ if you have multivariate variables X1, ... Xn 
+				- Find a new set of multivariate variables that are uncorrelated and find as much variance as possible
+				- if you put all the variables together in one matrix , find the best matrix created with fewer variables , ie . Lower rank that explain the whole of the data
+		- SVD - Singular value decomposition
+			+ wiki : https://en.wikipedia.org/wiki/Singular_value_decomposition
+			+ Take a look at the MIT lecture : 
+			+ Take a look at the pdf : https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf
+			+ equation : **A = UDV*** , where A is a mxn real matrix, with m>n, then A can be written as a so called SVD 
+				- U is a left singular vector ie, orthogonal
+				- V is a right singular vector ie, orthogonal
+				- D is a diaginal matrix
+		- PCA - Principal Component analysis
+			+ It can reduce the number of quantitative variables present
+			+ Check PCA from **Elements of Statistical Learning**
+			+ Some books
+				- Modern applied statistics with S
+				- introduction to statistical learning
 			
 	

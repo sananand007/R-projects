@@ -1,0 +1,98 @@
+---
+title: "Preprocessing using Caret package"
+author: "Sandeep Anand"
+date: "May 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE, highlight=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Preprocessing using Principal component analysis 
+
+- PC1 explains most of the variance in the data , and once considering the whole of the data , it is a very complex formula 
+- PC2 correspond to the the 2nd most 
+- Spam messages in the plot have a higher values of PC1 and there is a proper separation between spam and ham messages
+
+### PCA with caret 
+
+```{r PCA, echo=TRUE,eval=FALSE}
+library(caret);library(kernlab)
+data(spam)
+
+inTrain<-createDataPartition(spam$type, p=0.75, list=FALSE)
+
+training<- spam[inTrain,]
+test<-spam[-inTrain,]
+
+M<-abs(cor(training[,-58]))
+diag(M)<-0
+
+# High Correlation
+which(M>0.8,arr.ind = T)
+
+names(spam)[c(34,32)]
+plot(spam[,34], spam[,32])
+
+# Using SVD and PCA 
+smallSpam<-spam[c(34,32)]
+prComp<-prcomp(smallSpam)
+plot(prComp$x[,1],prComp$x[,2])
+
+# The first Principal component is like adding the two variables together , it does not vary , pretty much remains constant 
+# The second Principal component is like subtracting the two variables  , there is variance seen from the plots
+
+# Rotation matrix
+prComp$rotation
+
+
+# In the Spam data, we can use PCA
+typeColor<-((spam$type=="spam")*1 + 1)
+prCompall<-prcomp(log10(spam[,-58]+1))
+plot(prCompall$x[,1],prCompall$x[,2], col=typeColor, xlab="PC1", ylab="PC2")
+
+preProc<-preProcess(log10(spam[,-58]+1), method = "pca", pcaComp = 2)
+spamPC<-predict(preProc,log10(spam[,-58]+1))
+plot(spamPC[,1],spamPC[,2],col=typeColor)
+
+# Train the data
+preProc1<-preProcess(log10(training[,-58]+1), method="pca", pcaComp = 2)
+head(preProc1)
+trainPC<-predict(preProc1,log10(training[,-58]+1))
+modelFit1<-train(training$type ~ .,method="glm", data=trainPC)
+
+# Testset , use the same training data for the test set also
+# predict function will take the Principal components that we got through the training and get the new values for the test data set
+testPC<-predict(preProc, log10(training[,-58]+1))
+confusionMatrix(testing$type, predict(modelFit1, testPC))
+
+# The above part can also be done such that we can just use the train() function , to do the PCA as well
+```
+
+## Predicting with regression
+
+```{r Predicting with regression, echo=TRUE}
+library(caret);data(faithful);set.seed(333)
+inTraining<-createDataPartition(y=faithful$waiting, p=0.5, list = FALSE)
+trainFaith<-faithful[inTraining,];testFaith<-faithful[-inTraining,]
+head(trainFaith)
+
+plot(trainFaith$waiting,trainFaith$eruptions,pch=19,col="blue",xlab="Waiting",ylab="Duration")
+
+lm1<-lm(trainFaith$eruptions ~ trainFaith$waiting)
+length(lm1$fitted.values)
+
+
+plot(trainFaith$waiting, trainFaith$eruptions, pch=19, col="blue",xlab="Waiting",ylab="Duration")
+lines(trainFaith$waiting, predict(lm1), lwd=3)
+
+# Getting the RMSE on training
+sqrt(sum(lm1$fitted.values-trainFaith$eruptions)^2)
+# Getting the RMSE on test
+#sqrt(sum((predict(lm1, newdata=testFaith)-testFaith$eruptions)^2)
+
+modFit<-train(eruptions ~ waiting, data=trainFaith, method="lm")
+summary(modFit$finalModel)
+```
