@@ -268,11 +268,104 @@ library(caret)
 set.seed(1000)
 
 inTrain = createDataPartition(mixtures$CompressiveStrength, p = 3/4)[[1]]
-training = mixtures[intrain, ]
-testing = mixtures[-intrain, ]
+training = mixtures[inTrain, ]
+testing = mixtures[-inTrain, ]
+
+#head(training$CompressiveStrength)
+#str(training)
+
+library(dplyr)
+library(Hmisc)
+library(ggplot2)
+
+training<-mutate(training, index=1:nrow(training))
+
+head(training)
+
+ndata<-training[,-9] # All the columns except the 9th
+coldindx<-list()
+
+for (i in 1:ncol(ndata)){
+  coldindx[[i]]<-cut2(ndata[,i], g=10)
+}
+
+#Making the plots : Color by each of the variables in the data set 
+
+par(mfrow=c(2,5), mar = c(2,1,2,1))
+names<-names(ndata)
+
+for (i in 1:ncol(ndata)) {
+  plot(ndata[,i], training$CompressiveStrength, col=coldindx[[i]])
+  title(names[i])
+}
+
+p<-qplot(log10(training$Superplasticizer+1))+theme_grey()
+p
+```
 
 
-library(dplyr); library(Hmisc); library()
-qq<-qplot()
+# PML Q3
+
+```{r Alzeimer's data, echo=TRUE}
+
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(3433)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+pattern = "^IL"
+
+colnumbers <- grep(pattern, names(training))
+
+tr.IL<-training[,colnumbers]
+
+names(tr.IL)
+
+library(knitr)
+prc<-preProcess(tr.IL,method = "pca", pcaComp = 12)
+pred<-predict(prc,tr.IL)
+
+pve<-apply(pred,2,var)
+coln<-data.frame(cumsum(pve/sum(pve)))
+colnames(coln)<-"Variance explained"
+kable(coln, header=TRUE)
+
+
+o.pr <- prcomp(tr.IL,scale. = TRUE)
+s <- summary(o.pr)
+kable(t(s$importance))
+
+```
+
+# PML Q5
+
+```{r Alzeimers data 2, echo=TRUE}
+
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(3433)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+
+
+IL = grep("^IL", names(training))
+train.IL = training[,IL]
+test.IL = testing[,IL]
+train.IL$diagnosis <- training$diagnosis
+#nonPCA
+model<-train(diagnosis~.,method="glm", data=train.IL)
+predict_model<-predict(model, newdata=test.IL)
+confusionMatrix(predict_model, testing$diagnosis)
+
+
+#PCA
+modelPCA<-train(diagnosis~., method="glm", data=train.IL, preProcess = "pca", trControl=trainControl(preProcOptions = list(thresh=0.8)))
+confusionMatrix(predict(modelPCA, newdata=test.IL), testing$diagnosis)
 
 ```

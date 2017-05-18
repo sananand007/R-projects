@@ -271,7 +271,7 @@
 		+ Some books
 			- Modern applied statistics with S
 			- introduction to statistical learning
-	**Splitting into Decision Trees**
+	- **Splitting into Decision Trees**
 		+ Interatively split variables into groups
 		+ Basic Algorithm	of decision trees - https://en.wikipedia.org/wiki/Decision_tree_learning
 			- Start with Variables in one groups
@@ -283,5 +283,43 @@
 			- They use interactions between variables
 			- There are multiple tree building options in R , such as : rpart , party, tree -> all are tree packages 
 			- Book : https://www.amazon.com/Classification-Regression-Trees-Leo-Breiman/dp/0412048418
+	- **Bagging** - Bootstrapping with aggregated values
+		- resample your data , Refit your non-linear model, average those modelfilts together over resamples to get a smoother model fit
+		- Take a look at the below functions thouroughly and understand how these functions are written
+			+ ctreeBag$fit
+			+ ctreeBag$pred
+			+ ctreeBag$aggregate
+		Some resources to look into bagging
+			+ https://en.wikipedia.org/wiki/Bootstrap_aggregating
+			+ http://stat.ethz.ch/education/semesters/FS_2008/CompStat/sk-ch8.pdf
+	- **Random Forest**
+		- Bootstrap Samples 
+		- At each split, bootstrap variables
+		- Grow multiple trees and vote
+		- Some resources to take a look from in details
+			+ https://en.wikipedia.org/wiki/Random_forest
+			+ http://www.robots.ox.ac.uk/~az/lectures/ml/
+			+ 
+	- **Boosting**
+		- Take a number of possibly weak predictors 
+		- Weigh them and add them up
+		- Add them up and get a stronger predictor
+		- R's Multiple boosing libraries to be used and learned
+			+ gbm, mboost, ada, gamboost
+		- Some resources
+			+ http://webee.technion.ac.il/people/rmeir/BoostingTutorial.pdf
+			+ https://en.wikipedia.org/wiki/Gradient_boosting
+			+ Boosting tutorial : http://www.cc.gatech.edu/~thad/6601-gradAI-fall2013/boosting.pdf
+			+ http://www.netflixprize.com/assets/GrandPrize2009_BPC_BigChaos.pdf
+			+ https://kaggle2.blob.core.windows.net/wiki-files/327/09ccf652-8c1c-4a3d-b979-ce2369c985e4/Willem%20Mestrom%20-%20Milestone%201%20Description%20V2%202.pdf
+	- ** Model Based Prediction**
+		- Linear discrimant analysis assumes the function is a multivariate gaussian
+		- Quadratic discrimant analysis assumes that the function is a multivariate gaussian with different covariances
+		- Model Based Prediction : assumes more complicated versions of the covariance matrix
+		- Bayes Theorem & Naive Bayes (useful, if you have a large numeber of features)
+		- References present here: 
+			+ http://www.stat.washington.edu/mclust/
+			+ http://statweb.stanford.edu/~tibs/ElemStatLearn/
+			+ https://en.wikipedia.org/wiki/Linear_discriminant_analysis
+			+ https://en.wikipedia.org/wiki/Quadratic_classifier
 			
-	

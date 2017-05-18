@@ -96,3 +96,31 @@ sqrt(sum(lm1$fitted.values-trainFaith$eruptions)^2)
 modFit<-train(eruptions ~ waiting, data=trainFaith, method="lm")
 summary(modFit$finalModel)
 ```
+
+## Predicting with Trees
+
+```{r Using Decision Tress,echo=TRUE}
+data(iris);library(ggplot2);library(caret);library(kernlab)
+names(iris)
+
+inTrainiris<-createDataPartition(y=iris$Species, p=0.7, list=FALSE)
+trainingiris<-iris[inTrainiris,]
+testingiris<-iris[-inTrainiris,]
+
+dim(trainingiris);dim(testingiris)
+
+qplot(Petal.Width, Sepal.Width, colour=Species, data=trainingiris)
+
+# Fitting the model using the caret package train
+library(caret)
+modelFitiris <- train(Species~., method="rpart", data=trainingiris)
+print(modelFitiris$finalModel)
+
+
+#Plotting the Classification tree
+plot(modelFitiris$finalModel, uniform=TRUE, main="Classification Tree")
+text(modelFitiris$finalModel, use.n = TRUE, all=TRUE, cex=.8)
+#library(rpart);library(rattle)
+#fancyRpartPlot(modelFitiris$finalModel)
+
+```
