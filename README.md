@@ -312,7 +312,7 @@
 			+ Boosting tutorial : http://www.cc.gatech.edu/~thad/6601-gradAI-fall2013/boosting.pdf
 			+ http://www.netflixprize.com/assets/GrandPrize2009_BPC_BigChaos.pdf
 			+ https://kaggle2.blob.core.windows.net/wiki-files/327/09ccf652-8c1c-4a3d-b979-ce2369c985e4/Willem%20Mestrom%20-%20Milestone%201%20Description%20V2%202.pdf
-	- ** Model Based Prediction**
+	- **Model Based Prediction**
 		- Linear discrimant analysis assumes the function is a multivariate gaussian
 		- Quadratic discrimant analysis assumes that the function is a multivariate gaussian with different covariances
 		- Model Based Prediction : assumes more complicated versions of the covariance matrix
@@ -322,4 +322,54 @@
 			+ http://statweb.stanford.edu/~tibs/ElemStatLearn/
 			+ https://en.wikipedia.org/wiki/Linear_discriminant_analysis
 			+ https://en.wikipedia.org/wiki/Quadratic_classifier
-			
+	- Regularized Regression
+		+ As the number of predictors increase the training set erros always goes down or decrese
+		+ But after a certain time, due to overfitting the number the training set error will start to decrease
+	- Decomposing expected Prediction error
+		+ Irreducible error + Bias^2 + Variance
+	- Hard thresholding
+	- regularized regression
+	- Ridge regression path
+	- Important to pick up the correct lambda variable that is optimum for picking up bias for variance
+	- Some other Links are such that : 
+		+ http://www.cbcb.umd.edu/~hcorrada/PracticalML/
+		+ http://www.biostat.jhsph.edu/~ririzarr/Teaching/649/
+		+ http://www.cbcb.umd.edu/~hcorrada/AMSC689.html#readings
+		+ **Caret Package** has some other packages that can be used here, to fit different kind of prediction methods
+			- ridge
+			- lasso
+			- relaxo
+	- Combining Predictors
+		- Basic intuition is voting, just like in the case of Random forests 
+		- Even simple Blending can be useful
+		- Build an odd number of models
+		- Predict with each model
+		- Predict the class by majority vote
+	- Forcasting
+		+ Data are dependent over time
+		+ Specific pattern type
+		+ Beware of extrapolation times and heat maps also, not necessary that they will convey the correct information
+		+ Time series usage and decomposition 
+			- Trend - Consistently increases over time
+			- Seasonal - Where there is a pattern over a fixed period of time
+			- Cyclic - When data rises and falls over non-fixed periods
+		+ Break into Train and test sets 
+		+ Use simple movging average
+		+ Exponential smoothing
+		+ Use accuracy to get the forcast
+		+ Some Information and links that are useful to look 
+			+ https://www.otexts.org/fpp/6/1
+			+ Forcasting : https://www.otexts.org/fpp
+			+ https://en.wikipedia.org/wiki/Forecasting - check the github for code as well
+	- Unsupervised Learning
+		+ https://en.wikipedia.org/wiki/Recommender_system
+		+ cl_predict function in the clue package
+
+## Machine Learning Quiz 4
+	- 1. Fit (1) a random forest predictor relating the factor variable y to the remaining variables and (2) a boosted predictor using the "gbm" method. Fit these both with the train() command in the caret package.
+		What are the accuracies for the two approaches on the test data set? What is the accuracy among the test set samples where the two methods agree?
+	- 2. Set the seed to 62433 and predict diagnosis with all the other variables using a random forest ("rf"), 
+		boosted trees ("gbm") and linear discriminant analysis ("lda") model. Stack the predictions together using random forests ("rf"). 
+		What is the resulting accuracy on the test set? Is it better or worse than each of the individual predictions?
+	- 3. Set the seed to 233 and fit a lasso model to predict Compressive Strength. Which variable is the last coefficient to be set to zero as the penalty increases? 
+		
