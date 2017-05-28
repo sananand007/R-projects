@@ -366,10 +366,24 @@
 		+ cl_predict function in the clue package
 
 ## Machine Learning Quiz 4
-	- 1. Fit (1) a random forest predictor relating the factor variable y to the remaining variables and (2) a boosted predictor using the "gbm" method. Fit these both with the train() command in the caret package.
+	
+	-	Fit (1) a random forest predictor relating the factor variable y to the remaining variables and (2) a boosted predictor using the "gbm" method. Fit these both with the train() command in the caret package.
 		What are the accuracies for the two approaches on the test data set? What is the accuracy among the test set samples where the two methods agree?
-	- 2. Set the seed to 62433 and predict diagnosis with all the other variables using a random forest ("rf"), 
+	-  	Set the seed to 62433 and predict diagnosis with all the other variables using a random forest ("rf"), 
 		boosted trees ("gbm") and linear discriminant analysis ("lda") model. Stack the predictions together using random forests ("rf"). 
 		What is the resulting accuracy on the test set? Is it better or worse than each of the individual predictions?
-	- 3. Set the seed to 233 and fit a lasso model to predict Compressive Strength. Which variable is the last coefficient to be set to zero as the penalty increases? 
-		
+	-   Set the seed to 233 and fit a lasso model to predict Compressive Strength. Which variable is the last coefficient to be set to zero as the penalty increases? 
+	-   Fit a model using the bats() function in the forecast package to the training time series. 
+		Then forecast this model for the remaining time points. 
+		For how many of the testing points is the true value within the 95% prediction interval bounds?
+	-   Set the seed to 325 and fit a support vector machine using the e1071 package to predict Compressive Strength using the default settings. 
+		Predict on the testing set. What is the RMSE?
+## Machine Learning Project
+
+	+	The goal of your project is to predict the manner in which they did the exercise. 
+		This is the "classe" variable in the training set. You may use any of the other variables to predict with. 
+		You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, 
+		and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.		
+	+	I used Random forests and gradient boosting machines for this purpose 
+	+	Read Elements of Statistical Learning , to know whick Algorithm can perform better with Noise and why ?
+	+ 	For my dataset , It seems the OOSE for Random_forest is lower than GBM

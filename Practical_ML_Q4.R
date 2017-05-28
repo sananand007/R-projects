@@ -92,23 +92,6 @@ predict.gbm<-predict(modfit.gbm, testing)
 cmgbm<-confusionMatrix(predict.gbm,testing$diagnosis)
 cmgbm
 
-## Question-3
-set.seed(3523)
-library(AppliedPredictiveModeling)
-data(concrete)
-inTrain<-createDataPartition(concrete$CompressiveStrength, p=3/4)[[1]]
-training=concrete[inTrain,]
-testing=concrete[-inTrain,]
-set.seed(233)
-fit<-train(CompressiveStrength~.,data=training,method="lasso")
-predict.lasso<-predict(fit,testing)
-plot.enet(fit$finalModel,xvar = "penalty", use.color = TRUE)
-
-
-
-
-
-
 set.seed(62433)
 modfit.lda<-train(diagnosis~., method = "lda", data=training)
 predict.lda<-predict(modfit.lda, testing)
@@ -124,4 +107,60 @@ cmstacked<-confusionMatrix(predict.combined,testing$diagnosis)
 cmstacked
 sink()
 
+## Question-3
+set.seed(3523)
+library(AppliedPredictiveModeling)
+data(concrete)
+inTrain<-createDataPartition(concrete$CompressiveStrength, p=3/4)[[1]]
+training=concrete[inTrain,]
+testing=concrete[-inTrain,]
+set.seed(233)
+fit<-train(CompressiveStrength~.,data=training,method="lasso")
+predict.lasso<-predict(fit,testing)
+plot.enet(fit$finalModel,xvar = "penalty", use.color = TRUE)
 
+
+# Question-4
+library(lubridate) # For year() function below
+path<-"C:\Public\R-Projects\R-projects"
+setwd(path)
+getwd()
+dat = read.csv("gaData.csv")
+training = dat[year(dat$date) < 2012,]
+testing = dat[(year(dat$date)) > 2011,]
+tstrain = ts(training$visitsTumblr)
+
+library(forecast)
+fit.bats<-bats(tstrain)
+fcast<-forecast.bats(fit.bats, level = 95, h=nrow(testing))
+plot(fcast)
+
+count=0
+for (i in 1:nrow(testing)){
+  if (testing$visitsTumblr[i] > fcast$lower[i]){
+    if (testing$visitsTumblr[i] < fcast$upper[i]){
+      count<-count+1
+    }
+  }
+}
+print((count/nrow(testing))*100)
+
+
+
+# Question-5
+set.seed(3523)
+library(AppliedPredictiveModeling)
+data(concrete)
+inTrain = createDataPartition(concrete$CompressiveStrength, p = 3/4)[[1]]
+training = concrete[ inTrain,]
+testing = concrete[-inTrain,]
+set.seed(325)
+library(e1071)
+
+svm_model<-svm(CompressiveStrength~., data=training)
+pred_model<-predict(svm_model, testing)
+
+accuracyval<-accuracy(pred_model, testing$CompressiveStrength)
+accuracyval
+RMSE<-sqrt(sum((testing$CompressiveStrength-pred)^2)/nrow(testing))
+RMSE
