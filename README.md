@@ -387,3 +387,30 @@
 	+	I used Random forests and gradient boosting machines for this purpose 
 	+	Read Elements of Statistical Learning , to know whick Algorithm can perform better with Noise and why ?
 	+ 	For my dataset , It seems the OOSE for Random_forest is lower than GBM
+## Developing data products
+ 
+	+ 	Here we are very focussed on create R packages using R products like Shiny, rCharts, manipulate and googleVis
+	+	A Data product is the producion output of a statistical analysis
+	+ 	Book: Developing Data Products in R [This book can be got for free]
+		This book introduces the topic of Developing Data Products in R. A data product is the ideal output of a Data Science experiment. This book is based on the Coursera Class “Developing Data Products” as part of the Data Science Specialization. Particular emphasis is paid to developing Shiny apps and interactive graphics.
+		The book is available here: https://leanpub.com/ddp
+		https://github.com/seankross/slides/tree/gh-pages/Developing_Data_Products
+	+	Dr. Brian Caffo : https://sites.google.com/view/bcaffo/home	
+	+	https://datasciencespecialization.github.io/Developing_Data_Products/welcome.html
+## Shiny
+
+	+	Shiny Application and a shiny server
+	+	Shiny server documentation : http://docs.rstudio.com/shiny-server/
+		-	We will need to host the shiny code on a server 
+		-	It will call R in the background to run your algorithm
+		-	R studio has a free hosting server
+		-	can user aws or shiny's own paid service
+		-	Webserver that anyone can use **shinyapps.io**
+	+	For Shiny server, we would need to install a Linux OS - Check how to do that
+	+ 	Shiny apps .io project - https://datasciencespecialization.github.io/Developing_Data_Products/shinyproject.html
+	+ 	Shiny is a web developing platform for R
+	+ 	A little bit of knowlege of HTML , CSS and Java script is required for creating web products
+	+ 	Shiny R tutorial :  https://shiny.rstudio.com/tutorial
+	+	
+	
+	
