@@ -1,6 +1,18 @@
 # R-projects
 ## Random and Statistically interesting R projects/assignments
 
+### Some amazing R resources and Books that are going to help you out a lot
+
+| Book     	    								| Link          																	| Author 				|
+| ------------- 								|:---------------------------------------------------------------------------------:| ---------------------:|
+| Hands-On Programming with R   				| C:\Users\sanan\OneDrive\dumps\R-books 											| Garrett Grolemund 	|
+| Efficient R Programming      					| https://csgillespie.github.io/efficientR/      									| Colin Gillespie 		|
+| Advanced R      								| http://adv-r.had.co.nz/      														| Hadley Wickham 		|
+|Introduction to Data Science with R			| http://r4ds.had.co.nz/															| Garrett Grolemund		|	 
+|												|https://www.safaribooksonline.com/library/view/introduction-to-data/9781491915028/	| Garrett Grolemund		|
+|(tidyr/dplyr)Expert Data Wrangling with R		|https://www.rstudio.com/resources/webinars/data-wrangling-with-r-and-rstudio/		| Garrett Grolemund		|
+| Data Camp										|https://www.datacamp.com/courses													|						|		
+
 ## Projects to be synced 
 
 1. Statistical Inference project - 1
