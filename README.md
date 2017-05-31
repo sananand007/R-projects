@@ -13,6 +13,9 @@
 |(tidyr/dplyr)Expert Data Wrangling with R		|https://www.rstudio.com/resources/webinars/data-wrangling-with-r-and-rstudio/		| Garrett Grolemund		|
 | Data Camp										|https://www.datacamp.com/courses													|						|		
 
+## Mostyl you will not need this , but you can install packages directly from github
+	- devtools::install_github("rstudio/<package name>")
+
 ## Projects to be synced 
 
 1. Statistical Inference project - 1
@@ -423,6 +426,26 @@
 	+ 	Shiny is a web developing platform for R
 	+ 	A little bit of knowlege of HTML , CSS and Java script is required for creating web products
 	+ 	Shiny R tutorial :  https://shiny.rstudio.com/tutorial
-	+	
+	+	Main Steps to go through the shiny app
+		- Begin each app with a template
+		- Add elements as arguments to fluidPage()
+		- Create reactive inputs with an *Input() function
+		- Display reactive results with an *Output() function
+		- use the server function to assemble inputs and outputs
+	+ use the render() function to build reactive output to display the UI
+	+ Reactivity is the only thing that is very important here, and that will be taken care by the shinyapp
+	+ Server
+		- Use the server function to assemble inputs into outputs
+		1. Save the output that you build to output$
+		2. Build the Output with a render*() function
+		3. Access input values with input$
+		- Create reactivity by using Inputs to build rendered Ouputs
+	+ One directory with every file the app needs :
+		- The shiny server will look into the directory for **app.R**, use only app.R
+		- Put all the datasets that you need , datasets , images , cssm helper scripts etc..
+		- If your app takes a lot of code for ui and server , it would be beneficial to take up two codes **ui.R** and **server.R** , use only these names
+		- Shinyapps.io helps you run your app when you want to, it is a sever maintained by R studio
+	
+	
 	
 	
