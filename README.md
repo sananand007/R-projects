@@ -403,7 +403,6 @@
 	+	Read Elements of Statistical Learning , to know whick Algorithm can perform better with Noise and why ?
 	+ 	For my dataset , It seems the OOSE for Random_forest is lower than GBM
 ## Developing data products
- 
 	+ 	Here we are very focussed on create R packages using R products like Shiny, rCharts, manipulate and googleVis
 	+	A Data product is the producion output of a statistical analysis
 	+ 	Book: Developing Data Products in R [This book can be got for free]
@@ -413,7 +412,6 @@
 	+	Dr. Brian Caffo : https://sites.google.com/view/bcaffo/home	
 	+	https://datasciencespecialization.github.io/Developing_Data_Products/welcome.html
 ## Shiny
-
 	+	Shiny Application and a shiny server
 	+	Shiny server documentation : http://docs.rstudio.com/shiny-server/
 		-	We will need to host the shiny code on a server 
@@ -445,6 +443,82 @@
 		- Put all the datasets that you need , datasets , images , cssm helper scripts etc..
 		- If your app takes a lot of code for ui and server , it would be beneficial to take up two codes **ui.R** and **server.R** , use only these names
 		- Shinyapps.io helps you run your app when you want to, it is a sever maintained by R studio
+	+ Sharing
+		- Save your app in its own directory as app.R, or ui.R and server.R
+		- Host apps at shinyapps.io by:
+			1. Sign up a free shinyapps.io account
+			2. Install the shinyapps package
+			3. Build your Own server with Shiny Server or Shiny Server Pro
+	+ Reactivity
+		- Reactive functions are functions that take reactive values and knows what to do with them
+		- Example: renderPlot()
+		- Use of Reactive values , These act as datastreams that flow through your app
+		- Input list is a list if reactive values
+		- you can only call a reactive value from a function that is designed to work with one
+		- Toolkit:
+			+ renderPlot( {
+							hist(rnorm(input$number))
+							}), 
+			+ object will respond to any reactive value in the code
+			+ renderPlot() just runs the whole block of code associated with it
+			+ construct output using output$
+		- Modulazing using reactive() function , This builds a reactive object
+		- Reactive functions are basically functions
+			+ It is very important that we put () for all the reactive expressions
+			+ reactive expressions just make sure that they pass on the notifications
+			+ reactive expressions know whether they are valid or invalid
+			+ reactive expressions cache their values (the expression will return the most recent value, unless it has become invalidated)
+				this results in less computation
+			+ reactive() makes an object to use 
+			+ reactive expressions are themselves reactive
+			+ call a reactive expression like a function
+		- render*() functions make objects to display , always save the output to output$ , It makes an observer object that has a block of code 
+			associated with it
+		- isolate() - This creates output that is not reactive
+		- observeEvent() - Triggers code to run by the server
+		- observe()
+		- Delay reactions with eventReactive()
+		- eventReactive() 
+			+ Is used solely for delaying reactions, while usind a actionButton()
+		- What is the difference between observeEvent() and eventreactive() in a program ?
+			+ https://shiny.rstudio.com/articles/action-buttons.html
+		- using observeEvent() we can override the data object to have any other form of data
+			+ overriding can only be possible using reactiveValues() with multiple input types
+			+ reactiveValues create a list of reactive values to manipulate programitically using observeEvent()
+		- Reduce repitition - place code where it will be re-run as little as necessary
+		- Code inside the server function will be run once per end user as multiple copies of the same code is created 
+		- shiny showcase : https://www.rstudio.com/products/shiny/shiny-user-showcase/
+		- shiny gallery : https://shiny.rstudio.com/gallery/
+		- shiny comes with a list of tags, tags$h1() to add html functionality, or we can do names(tags)
+		- shiny gadget will have to have the ui part and the server part
+		- Static Elements : tags$
+			+ tags$a() -> a tag is important as the hyperlink with the href argument
+			+ tags$p() -> paragraph
+			+ tags$em() -> emphasis/Italics
+			+ tags$strong() -> bold
+			+ tags$code() -> styling
+		- Adding Images : To add an image from a file, save the file in a subdirectory names **www**
+		- We can also pass the html directly to the fluidPage()
+		- Layout Functions
+			+ Use fluidrow() and column() to shift and offset images and elements and arrange in rows and columns
+			+ Use different type of *panel() to do something different within your layout
+			+ sidebarLayout() - use sidebarPanel() and mainPanel() to divide app into two sections
+			+ navbarPage() - instead of tabsetPanel() we can also use this
+			+ navbarMenu() combines tab links into a dropdown menu for navbarPage()
+		- check out Dynamic Dashboards with shiny webinar , to know more about shiny dashboards
+		- The most popular HTML, CSS, and JavaScript framework for developing responsive, mobile first projects on the web. 
+			+ check bootstrap 4 CSS framework , http://getbootstrap.com
+		- Free codeacademy tutorial on CSS and HTML http://www.codeacademy.com/tracks/web
+		- Use jQuery to add javascript 
+		- more tutorials : http://zevross.com/blog/2016/04/19/r-powered-web-applications-with-shiny-a-tutorial-and-cheat-sheet-with-40-example-apps/		
+	+ Hans Rosling - The first time show of moving charts 
+		- google vis : https://cran.r-project.org/web/packages/googleVis/googleVis.pdf
+		- Use the DataCamp tutorial to work on Google vis
+	+ Plotly
+		+ For using plotly , the data should be in the form of a giant single data frame
+		+ Plotly can also give graphs for multi-line stock market graph that can be put in the webbage
+		+ Plotly can also help with heatmap, boxplots , histgrams , surface for 3D etc ..
+		+ plotly account - with github
 	
 	
 	
