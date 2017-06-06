@@ -405,8 +405,7 @@
 	+	Read Elements of Statistical Learning , to know whick Algorithm can perform better with Noise and why ?
 	+ 	For my dataset , It seems the OOSE for Random_forest is lower than GBM
 
-## Developing data products
-
+13. **Developing data products**
 	+ 	Here we are very focussed on create R packages using R products like Shiny, rCharts, manipulate and googleVis
 	+	A Data product is the producion output of a statistical analysis
 	+ 	Book: Developing Data Products in R [This book can be got for free]
@@ -416,8 +415,7 @@
 	+	Dr. Brian Caffo : https://sites.google.com/view/bcaffo/home	
 	+	https://datasciencespecialization.github.io/Developing_Data_Products/welcome.html
 
-	## Shiny
-
+14. **Shiny**
 	+	Shiny Application and a shiny server
 	+	Shiny server documentation : http://docs.rstudio.com/shiny-server/
 		-	We will need to host the shiny code on a server 
@@ -520,16 +518,16 @@
 	+ Hans Rosling - The first time show of moving charts 
 		- google vis : https://cran.r-project.org/web/packages/googleVis/googleVis.pdf
 		- Use the DataCamp tutorial to work on Google vis
-	+ Plotly
+14. **Plotly**
 		+ For using plotly , the data should be in the form of a giant single data frame
 		+ Plotly can also give graphs for multi-line stock market graph that can be put in the webbage
 		+ Plotly can also help with heatmap, boxplots , histgrams , surface for 3D etc ..
 		+ plotly account - with github 
 		+ plotly tutorials with R : https://plot.ly/r/ | https://cpsievert.github.io/plotly_book/ 
-	+ Markdown
+15. **Markdown**
 		+ https://seankross.github.io/slides/<>.html - This is the repo slide present -> create gh-pages , repository
 		+ github pages : https://pages.github.com/
-	+ Leaflet
+16. **Leaflet**
 		+ Javascript - widget, without knowing any JavaScript
 	
 	
