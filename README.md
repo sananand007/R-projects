@@ -518,7 +518,13 @@
 		+ For using plotly , the data should be in the form of a giant single data frame
 		+ Plotly can also give graphs for multi-line stock market graph that can be put in the webbage
 		+ Plotly can also help with heatmap, boxplots , histgrams , surface for 3D etc ..
-		+ plotly account - with github
+		+ plotly account - with github 
+		+ plotly tutorials with R : https://plot.ly/r/ | https://cpsievert.github.io/plotly_book/ 
+	+ Markdown
+		+ https://seankross.github.io/slides/<>.html - This is the repo slide present -> create gh-pages , repository
+		+ github pages : https://pages.github.com/
+	+ Leaflet
+		+ Javascript - widget, without knowing any JavaScript
 	
 	
 	

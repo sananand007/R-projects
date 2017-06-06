@@ -1,0 +1,91 @@
+---
+title: "Starbucks Store Location finder and Density of Starbucks Store in the United States"
+author: "Sandeep Anand"
+date: "June 4, 2017"
+output: html_document
+params: 
+  n:  100
+  d:  !r Sys.Date()
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+```
+
+
+## Description 
+
+###
+- Load the Starbucks data from https://opendata.socrata.com/api/views/ddym-zvjk/rows.csv
+- clean and Subset the data
+- Use Leaflet to plot All the data on the Map for only California with Labels of the respective Stores, with Street Names
+- Zoom In to find the Names and Labels of the stores present
+- Making a heatmap using leaflet , of the stores present in the USA
+
+```{r Load and clean the Data, echo=FALSE}
+path <- "C:/Public/R-Projects/R-projects/starbucks"
+file <- list.files(path = path)
+finalpath <- file.path(path, file)
+myData <- read.csv(file = finalpath, header = TRUE, sep = ",")
+toselect<-c("Latitude", "Longitude" , "State","Name", "Street.Address", "City")
+newData<-subset.data.frame(myData, select = toselect)
+newData.CA<-subset.data.frame(newData, State=="CA", select = c("Latitude", "Longitude","Name", "Street.Address", "City"))
+newData.CA$Information = paste("Starbucks",newData.CA$Name,",",newData.CA$Street.Address,",", newData.CA$City, ",", "CA")
+```
+
+## `r params$d`
+
+```{r Fancy Map, echo=FALSE}
+library(leaflet)
+leaflet() %>% addTiles() %>% addMarkers(data=newData.CA, lat = ~Latitude, lng = ~Longitude, popup = newData.CA$Information, clusterOptions = markerClusterOptions())
+```
+
+
+## Density Plots with Circles
+
+###
+- Finding out where there are the maximum density of Starbucks stores present in the United States 
+- Click on the Circles to know about the State
+
+```{r Density Plot, echo=FALSE}
+library(leaflet)
+countvec <- rep(NA, 51)
+
+State <- as.vector(unique(newData$State))
+
+for (i in 1:length(State)){
+  countvec[i] <- length(which(newData$State == State[i]))
+}
+
+# Column bind
+newcombData <- cbind.data.frame(State, countvec)
+
+# Getting the Data from the State information file
+path2 <- "C:/Public/R-Projects/R-projects/statesinfo"
+file2 <- list.files(path = path2)
+finalpath2 <- file.path(path2, file2)
+myDatastates <- read.csv(file = finalpath2, header = TRUE, sep = ",")
+
+newmergedData <- merge(myDatastates, newcombData, by="State", all=TRUE)
+
+m = leaflet(newmergedData) %>% addTiles() %>%
+  addCircles(lng = ~Longitude, lat = ~Latitude, weight=1, radius = ~countvec*200, popup = ~City)
+m
+
+# # Creating a continous palette function
+# pal = colorNumeric(
+#   palette = "Greens",
+#   domain = newmergedData$countvec
+# )
+# 
+# coordinates(newmergedData) <- cbind(newmergedData$Longitude, newmergedData$Latitude)
+# proj4string(newmergedData) <- CRS
+# 
+# n = leaflet(newmergedData) %>%
+#   addPolygons(stroke = FALSE, 
+#               smoothFactor = 0.2,
+#               fillOpacity = 1,
+#               color = ~pal(newmergedData$countvec),
+#               popup = ~City)
+
+```
