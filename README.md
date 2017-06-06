@@ -380,6 +380,7 @@
 		+ https://en.wikipedia.org/wiki/Recommender_system
 		+ cl_predict function in the clue package
 
+
 ## Machine Learning Quiz 4
 	
 	-	Fit (1) a random forest predictor relating the factor variable y to the remaining variables and (2) a boosted predictor using the "gbm" method. Fit these both with the train() command in the caret package.
@@ -393,6 +394,7 @@
 		For how many of the testing points is the true value within the 95% prediction interval bounds?
 	-   Set the seed to 325 and fit a support vector machine using the e1071 package to predict Compressive Strength using the default settings. 
 		Predict on the testing set. What is the RMSE?
+
 ## Machine Learning Project
 
 	+	The goal of your project is to predict the manner in which they did the exercise. 
@@ -402,7 +404,9 @@
 	+	I used Random forests and gradient boosting machines for this purpose 
 	+	Read Elements of Statistical Learning , to know whick Algorithm can perform better with Noise and why ?
 	+ 	For my dataset , It seems the OOSE for Random_forest is lower than GBM
+
 ## Developing data products
+
 	+ 	Here we are very focussed on create R packages using R products like Shiny, rCharts, manipulate and googleVis
 	+	A Data product is the producion output of a statistical analysis
 	+ 	Book: Developing Data Products in R [This book can be got for free]
@@ -411,7 +415,9 @@
 		https://github.com/seankross/slides/tree/gh-pages/Developing_Data_Products
 	+	Dr. Brian Caffo : https://sites.google.com/view/bcaffo/home	
 	+	https://datasciencespecialization.github.io/Developing_Data_Products/welcome.html
-## Shiny
+
+	## Shiny
+
 	+	Shiny Application and a shiny server
 	+	Shiny server documentation : http://docs.rstudio.com/shiny-server/
 		-	We will need to host the shiny code on a server 
