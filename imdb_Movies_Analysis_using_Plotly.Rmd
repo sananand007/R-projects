@@ -1,0 +1,142 @@
+---
+title: "Plotly demo using IMDB kaggle dataset"
+author: "Sandeep Anand"
+date: "June 11, 2017"
+output: 
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+    fig_width: 5
+    fig_height: 3
+    fig_caption: true
+params:
+  n: 100
+  d: !r Sys.Date()
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+## R Markdown
+
+###link used for the data 
+  + https://www.kaggle.com/deepmatrix/imdb-5000-movie-dataset/downloads/movie_metadata.csv.zip
+
+## Getting the Data & Data Cleaning
+
+### Points of Interest 
+  - Based on the IMDB score(>=7), check the budget spent on the movie , considering a USA movie on recent years [2014-2016]
+  - Based on the IMDB Score(>6), check the number of movies released on different separate genres considering a USA movie on recent years [2013-2016]
+
+```{r cars, echo = FALSE, warning=FALSE}
+library(tools)
+path_orginal <- "C:\\Public\\R-Projects\\R-projects\\datasets"
+path_store <- paste(path_orginal, "movie_metadata.csv", sep = "\\")
+
+for (i in list.files(path = path_orginal)) {
+  if (file_ext(i) == "csv" && i=="movie_metadata.csv"){
+    df = read.csv(file = path_store, header = TRUE, sep=",")
+  }
+}
+
+#head(df)
+predictors<-names(df)
+
+
+```
+
+## Plot the number of movies released in the US between 2013 to 2016 based on separate Genres and imdb score > 6
+
+```{r imdb score vs Language Category, echo=FALSE, warning=FALSE, fig.align='center', fig.height=4,fig.width=6}
+library(plotly)
+set.seed(1234)
+touse_b1 <- c("genres", "movie_title","gross","country","title_year","imdb_score")
+newdf_b1 <- df[touse_b1]
+
+newdf_b1_filt1 <- newdf_b1[which((newdf_b1$title_year >= 2014) & (newdf_b1$country == "USA") & (newdf_b1$imdb_score>6)), ]
+
+# Making sense of the movie title
+newdf_b1_filt1$movie_title<-as.character(newdf_b1_filt1$movie_title)
+newdf_b1_filt1$movie_title <- substr(newdf_b1_filt1$movie_title, 1, nchar(newdf_b1_filt1$movie_title)-2)
+
+newdf_b1_filt1$genres<-as.character(newdf_b1_filt1$genres)
+
+# Get all the Genres categories 
+gencat_filt1<-strsplit(newdf_b1_filt1$genres, "\\|")
+gencat_un<-unique(gencat_filt1)
+
+mylistofcat <- list()
+
+for (i in 1:length(gencat_un)) {
+    mylistofcat[i] <- gencat_un[[i]]
+}
+
+mylistofuniquecat <- unique(mylistofcat)
+
+lhs <- c()
+
+#Create a data frame here
+for (i in 1:length(mylistofuniquecat)) 
+  {
+    lhs[i] <- mylistofuniquecat[[i]]
+    assign(lhs[i], 0)
+  }
+
+df_final <- data.frame(lhs)
+df_final$count <- rep(0, length(mylistofuniquecat))
+df_final$lhs <- as.character(df_final$lhs)
+
+#Now to increment the count of the particular genre as you see in the main "imdb", data frame
+library(Hmisc)
+for (i in 1:length(gencat_filt1)) {
+  val<-match(gencat_filt1[[i]], df_final$lhs) #This gives the indices where the match occurs
+  for (j in 1:length(val)){
+    inc(df_final$count[val[j]])<-1
+  }
+}
+library(plotly)
+plot_ly(data = df_final, x= ~lhs, y= ~count, type = 'bar', text=text, 
+        marker = list(color = 'rgb(158, 202, 225)',
+                      line = list(color = 'rgb(8,50,118)',
+                                  width = 1.5)))
+
+```
+
+
+```{r imdb score Vs the Budget, echo=FALSE, warning=FALSE}
+library(plotly)
+
+touse <- c("movie_title","budget","title_year","imdb_score","country")
+newdf<- df[touse]
+
+#subset based on Year > 2014 only
+
+newdf_final <- newdf[ which((newdf$title_year >= 2014) & (newdf$country == "USA") & (newdf$imdb_score >= 7) & (!(is.na(newdf$imdb_score)))), ]
+newdf_final$budget <- newdf_final$budget/10^6
+newdf_final$movie_title<-as.character(newdf_final$movie_title)
+#strsplit(newdf_final$movie_title, "")
+#newdf_final$movie_title <- substr(newdf_final$movie_title,1,length(newdf_final))
+splitpoint <- lapply(strsplit(newdf_final$movie_title[1], ""), tail, 2)
+#as.character(splitpoint[[1]])
+
+newdf_final$movie_title <- substr(newdf_final$movie_title,1,nchar(newdf_final$movie_title)-2)
+```
+
+## Plotting Budget(in million) Based on imdb Score
+
+```{r plot 1, echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(plotly)
+library(ggforce)
+
+#Draw each page
+  
+p <-ggplot(data = newdf_final, aes(x=budget, y=imdb_score)) +
+    geom_point(aes(text = paste("Movie Title", movie_title))) +
+    geom_smooth(aes(colour = title_year, fill=title_year)) + facet_wrap_paginate(~title_year, ncol = 2, nrow = 2, page = 1) +
+    labs(x = "Budget(in mill US)", y = "imdb Score")
+
+ggplotly(p)
+
+```

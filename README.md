@@ -529,6 +529,9 @@
 		+ github pages : https://pages.github.com/
 16. **Leaflet**
 		+ Javascript - widget, without knowing any JavaScript
+17. **Analysis of IMDB Kaggle Dataset**
+		+ Finding trends in budget of the movie and the imdb scores
+		+ Finding trend in number of movies released belonging to a particular genre
 	
 	
 	
