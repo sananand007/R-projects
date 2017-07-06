@@ -1,0 +1,139 @@
+---
+title: "Instacart Buyer Analysis"
+author: "Sandeep Anand"
+output: html_notebook
+---
+
+#Description 
+
+In this competition, Instacart is challenging the Kaggle community to use this anonymized data on customer orders over time to predict which previously purchased products will be in a user's next order. 
+
+## Getting the Data
+```{r Getting the Data, eval=TRUE, warning=FALSE, echo=FALSE}
+path1 <- "C:/Public/Instacart/"
+for (i in list.files(path=path1, pattern = "\\.zip$")){
+  unzip(i, overwrite = TRUE)
+  }
+
+```
+
+```{r Data2, eval=TRUE, warning=FALSE, echo=FALSE}
+names <- character(0)
+for (j in list.files(path = path1, pattern = "\\.csv$")) 
+  {
+    names<-c(names,unlist(strsplit(j,"\\."))[1])
+}
+
+```
+
+```{r Data3, eval=TRUE, warning=FALSE, echo=FALSE}
+filenames<-list.files(path = path1, pattern = "*.csv$", full.names = TRUE)
+ldf <- lapply(filenames, read.csv)
+```
+
+```{r assignment, eval=TRUE, warning=FALSE, echo=FALSE}
+for(i in 1:(length(names)-1)){
+  nam <- paste(names[i], "df", sep = ".")
+  assign(nam, ldf[[i]])
+}
+```
+
+## Assignments to be used for Data-frame names:
+  - "aisles.df"
+  - "departments.df"
+  - "order_products__prior.df"
+  - "order_products__train.df"
+  - "orders.df" 
+
+```{r Orders.df Proc, eval=TRUE, warning=FALSE, echo=FALSE}
+order_train.df<-orders.df[orders.df$eval_set=="train",]
+order_prior.df<-orders.df[orders.df$eval_set=="prior",]
+order_test.df<-orders.df[orders.df$eval_set=="test",]
+
+head(order_products__prior.df)
+
+head(order_prior.df)
+```
+
+## Getting the mapping done For Prior set
+  - Get the mapping between order_id and the associated products for it for a particular user
+  - New Dataframes for getting 
+    + user-id, Order-id and count of products for each of the order-ids
+    + splitting the data-frame that corresponds to orders.csv (filtered based on prior) into multiple sub datafrmaes, based on user_id
+    + Get the products for each Order for each of the above data frames and put them into a list that will be an extra row
+    + Helper functions are present to break the number of userIds(~206k) into 207 chunks of 1000 each to process them faster
+    + chks is a List of length 1 which has another list of length 207
+    + Never create multiple variables: not be a wise decision to create multiple vars , why not process and get the output in this function itself
+
+```{r Helper Functions, eval=TRUE, warning=FALSE, echo=FALSE}
+require(plyr)
+chunks <- function(d, n){      
+    chunks <- split(d, ceiling(seq_along(d)/n))
+    names(chunks) <- NULL
+    return(chunks)
+}
+
+chunksplyr <- function(d, n) {
+  is<-seq(from=1, to=length(d), by=n)
+  if (tail(is,1)!=length(d)) {
+    is<-c(is, length(d))
+  }
+  
+  chunks<-ddply(head(seq_along(is),-1),
+                function (i) {
+                  start <- is[i];
+                  end <- is[i+1]-1;
+                  d[start:end]
+                }
+                )
+  lc <- length(chunks)
+  td<-tail(d,1)
+  chunks[[lc]] <- c(chunks[[lc]], td)
+  return(chunks)
+}
+
+```
+
+
+```{r mapping, eval=TRUE, warning=FALSE, echo=FALSE}
+temp1 <- c() 
+listofdfs <- c()
+numberobs = length(order_prior.df$order_id)
+numberuserids = unique(order_prior.df$user_id)
+order_prior.df_cols<-names(order_prior.df)
+order_prior.df_sub = order_prior.df[order_prior.df_cols[1:2]]
+
+cat("The total number of userIds:", length(numberuserids))
+#Break the data frame order_prior.df into multiple dfs based on user_id
+
+system.time(chks <- chunks(numberuserids,100))
+length(chks)
+#system.time(chks2 <- chunksplyr(numberuserids,1000))
+
+df = data.frame("user_id"=integer(), "order_id"=integer(), "product_count"=integer())
+
+x <- chks[[1]][1:100]
+
+idval <- integer()
+order <- integer()
+pcount <- integer()
+
+system.time(
+  lapply(x, function(x){
+    for (i in seq_along(x)) {
+      tempval <- order_prior.df[order_prior.df$user_id == x[i],]$order_id
+      lapply(seq_along(tempval), function(j){
+        idval[j] <<- x[i]
+        order[j] <<- tempval[j]
+        pcount[j] <<- length(which(order_products__prior.df$order_id == tempval[j]))
+      })
+    }
+    temp <- data.frame("user_id"=idval, "order_id"=order, "product_count"=pcount)
+    df <<- rbind(df, temp)
+  })
+)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
