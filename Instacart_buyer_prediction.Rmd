@@ -1,7 +1,9 @@
 ---
 title: "Instacart Buyer Analysis"
 author: "Sandeep Anand"
-output: html_notebook
+output:
+  html_document: default
+  html_notebook: default
 ---
 
 #Description 
@@ -9,7 +11,7 @@ output: html_notebook
 In this competition, Instacart is challenging the Kaggle community to use this anonymized data on customer orders over time to predict which previously purchased products will be in a user's next order. 
 
 ## Getting the Data
-```{r Getting the Data, eval=TRUE, warning=FALSE, echo=FALSE}
+```{r Getting the Data, eval=TRUE, warning=FALSE, echo=FALSE, eval=FALSE}
 path1 <- "C:/Public/Instacart/"
 for (i in list.files(path=path1, pattern = "\\.zip$")){
   unzip(i, overwrite = TRUE)
@@ -18,6 +20,7 @@ for (i in list.files(path=path1, pattern = "\\.zip$")){
 ```
 
 ```{r Data2, eval=TRUE, warning=FALSE, echo=FALSE}
+path1 <- "C:/Public/Instacart/"
 names <- character(0)
 for (j in list.files(path = path1, pattern = "\\.csv$")) 
   {
@@ -27,40 +30,41 @@ for (j in list.files(path = path1, pattern = "\\.csv$"))
 ```
 
 ```{r Data3, eval=TRUE, warning=FALSE, echo=FALSE}
+library(data.table)
 filenames<-list.files(path = path1, pattern = "*.csv$", full.names = TRUE)
-ldf <- lapply(filenames, read.csv)
+ldf <- lapply(filenames, fread)
 ```
 
 ```{r assignment, eval=TRUE, warning=FALSE, echo=FALSE}
 for(i in 1:(length(names)-1)){
-  nam <- paste(names[i], "df", sep = ".")
+  nam <- paste(names[i], "dt", sep = ".")
   assign(nam, ldf[[i]])
 }
 ```
 
 ## Assignments to be used for Data-frame names:
-  - "aisles.df"
-  - "departments.df"
-  - "order_products__prior.df"
-  - "order_products__train.df"
-  - "orders.df" 
+  - "aisles.dt"
+  - "departments.dt"
+  - "order_products__prior.dt"
+  - "order_products__train.dt"
+  - "orders.dt" 
 
 ```{r Orders.df Proc, eval=TRUE, warning=FALSE, echo=FALSE}
-order_train.df<-orders.df[orders.df$eval_set=="train",]
-order_prior.df<-orders.df[orders.df$eval_set=="prior",]
-order_test.df<-orders.df[orders.df$eval_set=="test",]
+order_train.dt<-orders.dt[orders.dt$eval_set=="train",]
+order_prior.dt<-orders.dt[orders.dt$eval_set=="prior",]
+order_test.dt<-orders.dt[orders.dt$eval_set=="test",]
 
-head(order_products__prior.df)
+head(order_products__prior.dt)
 
-head(order_prior.df)
+head(order_prior.dt)
 ```
 
 ## Getting the mapping done For Prior set
   - Get the mapping between order_id and the associated products for it for a particular user
-  - New Dataframes for getting 
+  - New DataTables for getting 
     + user-id, Order-id and count of products for each of the order-ids
-    + splitting the data-frame that corresponds to orders.csv (filtered based on prior) into multiple sub datafrmaes, based on user_id
-    + Get the products for each Order for each of the above data frames and put them into a list that will be an extra row
+    + splitting the data-table that corresponds to orders.csv (filtered based on prior) into multiple sub data tables, based on user_id
+    + Get the products for each Order for each of the above data tables and put them into a list that will be an extra row
     + Helper functions are present to break the number of userIds(~206k) into 207 chunks of 1000 each to process them faster
     + chks is a List of length 1 which has another list of length 207
     + Never create multiple variables: not be a wise decision to create multiple vars , why not process and get the output in this function itself
@@ -94,44 +98,127 @@ chunksplyr <- function(d, n) {
 
 ```
 
+## Getting some sense with Plots 
 
-```{r mapping, eval=TRUE, warning=FALSE, echo=FALSE}
-temp1 <- c() 
-listofdfs <- c()
-numberobs = length(order_prior.df$order_id)
-numberuserids = unique(order_prior.df$user_id)
-order_prior.df_cols<-names(order_prior.df)
-order_prior.df_sub = order_prior.df[order_prior.df_cols[1:2]]
+ - Get the Order Count based on users
+ - Check & Plot the 10% user_ids who have the maximum number of Orders
+ - Get a quantile distribution of the orders , for eg, home many users fall under 95% of the total orders
+ - 95% of the Users have less than 50 orders , so presumably if a user has already ordered 50 times , very less likely to re-order - Plotted the QQ distribution plot
 
+
+```{r Plots with Analysis 1, eval=TRUE, warning=FALSE, echo=FALSE, message=FALSE}
+numberobs = length(order_prior.dt$order_id)
+numberuserids = unique(order_prior.dt$user_id)
+order_prior.dt_cols<-names(order_prior.dt)
+
+ordcount<-order_prior.dt[, .N, by=user_id]
+
+
+colnames(ordcount)[colnames(ordcount)=="N"]<-"order_count"
+
+library(ggplot2)
+b<-ggplot(data = ordcount, aes(x=user_id, y=order_count, alpha=0.8))
+b+geom_bar(stat = "identity")
+
+library(dplyr)
+new_ordcount <- ordcount[order(-order_count), ]
+head(new_ordcount)
+quantile(new_ordcount$order_count, probs = seq(0,1,0.05))
+
+ggplot(new_ordcount, aes(sample=order_count)) + stat_qq()
+
+
+```
+
+ - Get the products info for each order - Use Merge concept here to get this done amazingly quick :
+    + Used Inner join concept:  https://rstudio-pubs-static.s3.amazonaws.com/52230_5ae0d25125b544caab32f75f0360e775.html
+    + Get the Products data table also merged with the Resultant table to get a better understanding of the products 
+    + DT[i, j, by] - Take DT, subset rows using i, then calculate j, grouped by by.
+    + The order_prior.dt is handled here for evaluations before the predictions
+
+```{r Merge Order_prior and order_product, eval=TRUE, warning=FALSE, echo=FALSE}
+
+setkey(order_prior.dt, order_id)
+setkey(order_products__prior.dt, order_id)
+res.dt<-order_prior.dt[order_products__prior.dt, nomatch=0]
+head(res.dt,20)
+
+
+setkey(res.dt, product_id)
+setkey(products.dt, product_id)
+res_final.dt<- res.dt[products.dt, nomatch=0]
+head(res_final.dt,20)
+
+
+head(res_final.dt[, .(order_id, user_id, product_id, product_name)], 10)
+
+product_count <- res_final.dt[, .(order_id, user_id, product_id, product_name)][, .(.N), by= .(order_id, user_id)]
+colnames(product_count)[colnames(product_count)=="N"]<-"product_count"
+
+
+library(dplyr)
+res_sort<-product_count[order(user_id),]
+head(res_sort,20)
+
+
+```
+ 
+ - Not using the below part of the notebook as that is not the right way to approach the handling of the data set
+
+```{r mapping, eval=TRUE, warning=FALSE, echo=FALSE, eval=FALSE}
 cat("The total number of userIds:", length(numberuserids))
-#Break the data frame order_prior.df into multiple dfs based on user_id
+#Break the data frame order_prior.dt into multiple dts based on user_id
 
 system.time(chks <- chunks(numberuserids,100))
 length(chks)
 #system.time(chks2 <- chunksplyr(numberuserids,1000))
 
-df = data.frame("user_id"=integer(), "order_id"=integer(), "product_count"=integer())
+dt = data.table("user_id"=integer(), "order_id"=integer(), "product_count"=integer())
 
-x <- chks[[1]][1:100]
+#x <- chks[[1]][1:100]
+
+
 
 idval <- integer()
 order <- integer()
 pcount <- integer()
 
 system.time(
+for (i in 1:2) {
+  x <- chks[[i]][1:100]
   lapply(x, function(x){
     for (i in seq_along(x)) {
-      tempval <- order_prior.df[order_prior.df$user_id == x[i],]$order_id
+      tempval <- order_prior.dt[order_prior.dt$user_id == x[i],]$order_id
       lapply(seq_along(tempval), function(j){
         idval[j] <<- x[i]
         order[j] <<- tempval[j]
-        pcount[j] <<- length(which(order_products__prior.df$order_id == tempval[j]))
+        pcount[j] <<- length(which(order_products__prior.dt$order_id == tempval[j]))
       })
     }
-    temp <- data.frame("user_id"=idval, "order_id"=order, "product_count"=pcount)
-    df <<- rbind(df, temp)
+    temp <- data.table("user_id"=idval, "order_id"=order, "product_count"=pcount)
+    dt <<- rbind(dt, temp)
   })
+}
 )
+
+system.time(
+sapply(chks[1:2], function(x)
+  {
+    lapply(x, function(x){
+      for (i in seq_along(x)) {
+        tempval <- order_prior.dt[order_prior.dt$user_id == x[i],]$order_id
+        lapply(seq_along(tempval), function(j){
+          idval[j] <<- x[i]
+          order[j] <<- tempval[j]
+          pcount[j] <<- length(which(order_products__prior.dt$order_id == tempval[j]))
+        })
+      }
+      temp <- data.table("user_id"=idval, "order_id"=order, "product_count"=pcount)
+      dt <<- rbind(dt, temp)
+    })
+})
+)
+
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
