@@ -10,6 +10,10 @@ output:
 
 In this competition, Instacart is challenging the Kaggle community to use this anonymized data on customer orders over time to predict which previously purchased products will be in a user's next order. 
 
+- The Sample submission file has the user's next order and the products present in the next order 
+- If there are "n" users them the number of rows in the submission file will be "n"
+- Not looking for the best model but a strong F statistic or an accurate model
+
 ## Getting the Data
 ```{r Getting the Data, eval=TRUE, warning=FALSE, echo=FALSE, eval=FALSE}
 path1 <- "C:/Public/Instacart/"
@@ -135,6 +139,7 @@ ggplot(new_ordcount, aes(sample=order_count)) + stat_qq()
     + Get the Products data table also merged with the Resultant table to get a better understanding of the products 
     + DT[i, j, by] - Take DT, subset rows using i, then calculate j, grouped by by.
     + The order_prior.dt is handled here for evaluations before the predictions
+    + Plot the top 20 products only as most 1% is also a large value to plot
 
 ```{r Merge Order_prior and order_product, eval=TRUE, warning=FALSE, echo=FALSE}
 
@@ -150,18 +155,73 @@ res_final.dt<- res.dt[products.dt, nomatch=0]
 head(res_final.dt,20)
 
 
-head(res_final.dt[, .(order_id, user_id, product_id, product_name)], 10)
+res.product.name.count<-res_final.dt[, .(order_id, user_id, product_id, product_name)][order(order_id, -user_id)][, .(.N), by= .(product_name)]
+colnames(res.product.name.count)[colnames(res.product.name.count) == "N"] <-"pnames_count"
+quantile(res.product.name.count[order(-pnames_count)]$pnames_count, probs = seq(0,1,0.01))
+
+# Plot the top 20 products only as most 1% is also a large value to plot
+bar <- ggplot(res.product.name.count[order(-pnames_count)][1:20]) +
+  geom_bar(mapping = aes(x=product_name, y=pnames_count), stat = "identity")+
+  ggtitle(label = "Top 20 Products Ordered by Users")
+  
+bar+coord_flip()
 
 product_count <- res_final.dt[, .(order_id, user_id, product_id, product_name)][, .(.N), by= .(order_id, user_id)]
 colnames(product_count)[colnames(product_count)=="N"]<-"product_count"
-
+head(product_count, 20)
 
 library(dplyr)
-res_sort<-product_count[order(user_id),]
+res_sort<-product_count[order(user_id, -product_count),]
 head(res_sort,20)
 
 
+# res_sort has the total number product count of each user for each order_id
+ggplot(res_sort[user_id %in% c(1,2)], aes(x = order_id, y=product_count, color=user_id)) + 
+  geom_bar(stat = "identity")
+
+
 ```
+
+## Habit analysis of each user based on the products ordered sequence
+  - Broken the data set to analyze which user is ordering which product more
+  - Used tapply and data table methods to find out that we are having the memory issues so had to break down the data-table
+
+```{r Habit Analysis , warning=FALSE, eval=TRUE, message=FALSE, echo=FALSE}
+head(res_final.dt,20)
+
+#Select the columns that you want to do habit analysis on
+habit1.dt <- res_final.dt[, .(order_id, user_id, order_number, order_dow, order_hour_of_day, product_id, product_name)]
+head(habit1.dt)
+
+#Get the particular columns ordered based on order_id, user_id , order_number
+habit1.order1 <- habit1.dt[order(user_id, order_id, order_number)]
+head(habit1.order1,20)
+
+# Get the new column with the Frequency of occurence of each Product for each user
+habit1.order2 <- habit1.order1[, .(user_id, product_id)]
+head(habit1.order2)
+
+#### Getting a List of Data Tables which has the count per user , the Product_Ids 
+## This will help me to get which products are highly ordered by each user
+# Break to avoid memory issues
+#----------------------------------------------------------------
+setkey(habit1.order2, user_id)
+
+breakdt1<-habit1.order2[user_id %in% c(1:50000)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
+breakdt2<-habit1.order2[user_id %in% c(50001:100001)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
+breakdt3<-habit1.order2[user_id %in% c(100001:150001)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
+breakdt4<-habit1.order2[user_id %in% c(150001:200001)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
+breakdt5<-habit1.order2[user_id %in% c(200001:length(numberuserids))][, .(Aggregate.count = .N), by=.(user_id, product_id)]
+
+#listofdt.peruser.prodid<-tapply(habit1.order2$product_id, habit1.order2$user_id, function(x){as.data.table(table(x))})
+#----------------------------------------------------------------
+
+head(habit1.order2,20)
+
+nrow(habit1.dt[habit1.dt$user_id==1,])
+```
+
+
  
  - Not using the below part of the notebook as that is not the right way to approach the handling of the data set
 
