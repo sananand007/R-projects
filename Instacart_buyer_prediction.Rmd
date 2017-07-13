@@ -146,12 +146,14 @@ ggplot(new_ordcount, aes(sample=order_count)) + stat_qq()
 setkey(order_prior.dt, order_id)
 setkey(order_products__prior.dt, order_id)
 res.dt<-order_prior.dt[order_products__prior.dt, nomatch=0]
+# Inner Join of prior orders and the Products information data table
 head(res.dt,20)
 
 
 setkey(res.dt, product_id)
 setkey(products.dt, product_id)
 res_final.dt<- res.dt[products.dt, nomatch=0]
+# Inner Join of the Above result and the Products Id and name data table
 head(res_final.dt,20)
 
 
@@ -207,18 +209,55 @@ head(habit1.order2)
 #----------------------------------------------------------------
 setkey(habit1.order2, user_id)
 
-breakdt1<-habit1.order2[user_id %in% c(1:50000)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
-breakdt2<-habit1.order2[user_id %in% c(50001:100001)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
-breakdt3<-habit1.order2[user_id %in% c(100001:150001)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
-breakdt4<-habit1.order2[user_id %in% c(150001:200001)][, .(Aggregate.count = .N), by=.(user_id, product_id)]
-breakdt5<-habit1.order2[user_id %in% c(200001:length(numberuserids))][, .(Aggregate.count = .N), by=.(user_id, product_id)]
+breakdt1<-habit1.order2[user_id %in% c(1:100000)][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id,-Aggregate.count)]
+breakdt2<-habit1.order2[user_id %in% c(100001:200000)][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id, -Aggregate.count)]
+breakdt3<-habit1.order2[user_id %in% c(200001:length(numberuserids))][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id, -Aggregate.count)]
+
+head(breakdt1, 20)
+counter <<- as.integer(0)
+top <<- as.integer(0)
+
+
+#TODO : Put this into a function to apply all the three breaks
+
+res_pcount1 <- breakdt1[user_id %in% c(1:100000)][, lapply(.SD, 
+  function(x) {
+    # x is a list
+    #-- Get the index 1 and 3 here, as columns are getting repeated due to SD
+    counter <<- counter+1
+    if (counter == 1 || counter ==3) {
+      # Get the Top 10% for each user
+      top1 <<- as.integer(0.1*length(x))
+      #print(top1)
+      }
+    head(x,top1)
+    }
+      ), by=.(user_id)]
+
+breakdt1[user_id %in% c(1,2)][, print(.SD),by=user_id]
 
 #listofdt.peruser.prodid<-tapply(habit1.order2$product_id, habit1.order2$user_id, function(x){as.data.table(table(x))})
 #----------------------------------------------------------------
+```
 
-head(habit1.order2,20)
+## Plotting each User's Top 5% based based on Product Id Count
 
-nrow(habit1.dt[habit1.dt$user_id==1,])
+```{r Plot-analyze 1, eval=TRUE, warning=FALSE, message=FALSE, echo=FALSE}
+
+ggplot(res_pcount)
+
+```
+
+
+## Plotting the Top 1% Product for each user
+ - Most of the Counts for each user_id lies below 20 and it seems most of the maximum products are between (0-10) counts
+ - Have to find another way to find only the top 1% for each user and for each Product id
+```{r Plotting habit analysis, echo=FALSE, eval=TRUE, warning=FALSE, message=FALSE}
+library(RColorBrewer)      # for brewer.pal(...)
+ggplot(breakdt1[user_id %in% c(1:1000)], aes(x = user_id , y=Aggregate.count)) +
+  geom_point(na.rm = FALSE, stat = "identity") 
+
+
 ```
 
 
