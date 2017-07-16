@@ -102,7 +102,7 @@ chunksplyr <- function(d, n) {
 
 ```
 
-## Getting some sense with Plots 
+## Sample Plot to see the value of the number of Orders by each user
 
  - Get the Order Count based on users
  - Check & Plot the 10% user_ids who have the maximum number of Orders
@@ -134,7 +134,7 @@ ggplot(new_ordcount, aes(sample=order_count)) + stat_qq()
 
 ```
 
- - Get the products info for each order - Use Merge concept here to get this done amazingly quick :
+ - Get the products info for each order - Use Merge concept from Data.table here to get this done amazingly quick :
     + Used Inner join concept:  https://rstudio-pubs-static.s3.amazonaws.com/52230_5ae0d25125b544caab32f75f0360e775.html
     + Get the Products data table also merged with the Resultant table to get a better understanding of the products 
     + DT[i, j, by] - Take DT, subset rows using i, then calculate j, grouped by by.
@@ -173,13 +173,16 @@ colnames(product_count)[colnames(product_count)=="N"]<-"product_count"
 head(product_count, 20)
 
 library(dplyr)
-res_sort<-product_count[order(user_id, -product_count),]
+res_sort<-product_count[order(order_id, -product_count),]
 head(res_sort,20)
 
 
 # res_sort has the total number product count of each user for each order_id
-ggplot(res_sort[user_id %in% c(1,2)], aes(x = order_id, y=product_count, color=user_id)) + 
-  geom_bar(stat = "identity")
+res_sort$color <- ifelse(res_sort$product_count > 30 ,"red",NA)
+temp<-res_sort[order_id %in% c(1:1000)]
+ggplot(temp, aes(x = order_id, y=product_count, colour = color)) + 
+  geom_bar(stat="identity", position = "dodge")+
+  theme_minimal() + scale_colour_identity()
 
 
 ```
@@ -209,49 +212,163 @@ head(habit1.order2)
 #----------------------------------------------------------------
 setkey(habit1.order2, user_id)
 
-breakdt1<-habit1.order2[user_id %in% c(1:100000)][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id,-Aggregate.count)]
-breakdt2<-habit1.order2[user_id %in% c(100001:200000)][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id, -Aggregate.count)]
-breakdt3<-habit1.order2[user_id %in% c(200001:length(numberuserids))][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id, -Aggregate.count)]
+
+#breakwhole<-habit1.order2[user_id %in% c(1:length(habit1.order2$user_id))][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id,-Aggregate.count)]
+
+breakdt1<-NULL
+breakdt2<-NULL
+breakdt3<-NULL
+breakdt4<-NULL
+
+
+head(habit1.order2,20)
+
+
+breakdt1<-habit1.order2[user_id %in% c(1:50000)][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id,-Aggregate.count)]
+breakdt2<-habit1.order2[user_id %in% c(50001:100000)][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id, -Aggregate.count)]
+breakdt3<-habit1.order2[user_id %in% c(100001:150000)][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id,-Aggregate.count)]
+breakdt4<-habit1.order2[user_id %in% c(150001:length(numberuserids))][, .(Aggregate.count = .N), by=.(user_id, product_id)][order(user_id, -Aggregate.count)]
 
 head(breakdt1, 20)
-counter <<- as.integer(0)
-top <<- as.integer(0)
-
 
 #TODO : Put this into a function to apply all the three breaks
+#To Apply the function below to all the three data tables above
 
-res_pcount1 <- breakdt1[user_id %in% c(1:100000)][, lapply(.SD, 
-  function(x) {
-    # x is a list
-    #-- Get the index 1 and 3 here, as columns are getting repeated due to SD
-    counter <<- counter+1
-    if (counter == 1 || counter ==3) {
-      # Get the Top 10% for each user
-      top1 <<- as.integer(0.1*length(x))
-      #print(top1)
-      }
-    head(x,top1)
-    }
-      ), by=.(user_id)]
 
-breakdt1[user_id %in% c(1,2)][, print(.SD),by=user_id]
+# res_pcount1 <- breakdt1[user_id %in% c(1:100000)][, lapply(.SD, 
+#   function(x) {
+#     # x is a list
+#     #-- Get the index 1 and 3 here, as columns are getting repeated due to SD
+#     counter <<- counter+1
+#     if (counter == 1 || counter ==3) {
+#       # Get the Top 10% for each user
+#       top1 <<- as.integer(0.1*length(x))
+#       #print(top1)
+#       }
+#     head(x,top1)
+#     }
+#       ), by=.(user_id)]
+
+
+
+res_heavy <- lapply(list(breakdt1,breakdt2,breakdt3,breakdt4), function(y) {
+  
+  val1 <<- as.integer(y$user_id[1])
+  val2 <<- as.integer(last(y$user_id))    
+  
+  y[user_id %in% c(val1:val2)][, lapply(.SD, 
+                                       function(x){
+                                         head(x,as.integer(0.1*length(x)))
+                                       }), by=.(user_id)]
+})  
+
+
+# breakdt1[user_id %in% c(val1:val2)][, lapply(.SD, 
+#                                        function(x){
+#                                          head(x,as.integer(0.1*length(x)))
+#                                        }), by=.(user_id)]
+
 
 #listofdt.peruser.prodid<-tapply(habit1.order2$product_id, habit1.order2$user_id, function(x){as.data.table(table(x))})
 #----------------------------------------------------------------
 ```
 
-## Plotting each User's Top 5% based based on Product Id Count
+## Plotting each User's Top 5% based based on Product Id Count for the 1st 100k users 
+  - This will be a sample to see what is the highest product count for most/average distribution of users
+  - Only 38 Users have product Ids that have been orderes more than 90 times by them
+  - These users are highly likely to order these same products
+  - The reason for getting te top 5% is to make a decision on the final prediction on the test set
+  - res_heavy is the List containing the top 10% of Product count data only , that includes 93% of the user ids
+    so this reduces the Sample size a bit
 
 ```{r Plot-analyze 1, eval=TRUE, warning=FALSE, message=FALSE, echo=FALSE}
 
-ggplot(res_pcount)
+  #Plotting the 1st chunk 
 
+library(ggrepel)
+nrow(res_heavy[[1]][Aggregate.count>90])
+
+res_heavy[[1]]$color <- ifelse(res_heavy[[1]]$Aggregate.count > 90, "red", NA)
+b <- ggplot(data = res_heavy[[1]], aes(x=user_id, y=Aggregate.count, colour=color)) +
+  geom_bar(stat="identity", position = "dodge")+
+  theme_minimal()+
+  scale_colour_identity()
+  #geom_label(mapping = aes(label=res_pcount1$user_id), stat = "identity", data = res_pcount1[Aggregate.count>85])
+b
+#b + coord_flip() 
+  #geom_text_repel(data=subset(res_pcount1, Aggregate.count>90),
+   #         aes(user_id,Aggregate.count,label=user_id, hjust="top"), label.size = 0.05)
+
+```
+
+
+## Starting with xgboost model to predict on the test set 
+  - Looks like the model needs Features such as "order_hour_of_day" and "order_dow" as well than just predicting based pn Product count for each user
+  - Submission will have only order_id and product_id
+  
+    + First Step stupid prediction with no model but just based on count of Products per user as the only predictor
+
+```{r Prediction-anlysis-1, message=FALSE, eval=TRUE, warning=FALSE, echo=FALSE}
+
+# Initialize the counter and the listval that will account for the product IDs for the final submission
+counterout <<- 0
+finalset <<- list()
+matchflag <<- FALSE
+precistionconstant = 10 # change this as per requirement
+
+res.1<-lapply(order_test.dt$user_id[1:length(order_test.dt$user_id)], function(x) {
+  counterout <<- counterout+1
+  lapply(list(1,2,3,4), function(y) {
+      if (!is.na(match(x, res_heavy[[y]]$user_id)) & !isTRUE(matchflag)) {
+        matchflag <<- TRUE
+        temp.dt <- res_heavy[[y]][user_id %in% x][,.(product_id, Aggregate.count)]
+        if (as.integer(length(temp.dt$product_id))<=precistionconstant) {
+          finalset[counterout] <<- paste(temp.dt$product_id,collapse = " ")
+          #print(finalset)
+        }
+        else
+        {
+          finalset[counterout] <<- paste(temp.dt$product_id[1:precistionconstant], collapse = " ")
+        }
+      }
+  })
+  if (!isTRUE(matchflag))
+  {
+    # Check if there is no Match for any user_id
+    finalset[counterout]<<-"None"
+  }
+  matchflag <<- FALSE
+  })
+
+
+#rapply(example, function(x) {ifelse(is.null(x), "found", x)}, how = "replace")
+
+#rapply(finalset[1:10], function(x) ifelse(is.null(x), "None", x), how = "replace")
+
+# Based on the user_id of the test set, lets come up with prediction based on the maximum probability
+
+
+```
+
+## Joining the two Lists into one data frame and writing to a csv to get the Submission File
+  - Need to characterise this , take almost 5-6 minutes here
+  
+```{r results Section, echo=TRUE, warning=FALSE, eval=TRUE, message=FALSE}
+
+submission <- do.call(rbind, Map(data.frame, order_id = order_test.dt$order_id, products = finalset))
+
+# Test to get a csv and then we can do submission 
+library(dplyr)
+test.sub <- submission[c(1:20),]
+ps1<-"C:/Public/Instacart/submission.csv"
+write.table(submission, file = ps1, sep=",", col.names = TRUE, row.names = FALSE)
 ```
 
 
 ## Plotting the Top 1% Product for each user
  - Most of the Counts for each user_id lies below 20 and it seems most of the maximum products are between (0-10) counts
  - Have to find another way to find only the top 1% for each user and for each Product id
+ - The Plot below is more granular and zoomed than the plot above and is hence clearer to see
 ```{r Plotting habit analysis, echo=FALSE, eval=TRUE, warning=FALSE, message=FALSE}
 library(RColorBrewer)      # for brewer.pal(...)
 ggplot(breakdt1[user_id %in% c(1:1000)], aes(x = user_id , y=Aggregate.count)) +
@@ -318,6 +435,14 @@ sapply(chks[1:2], function(x)
 })
 )
 
+```
+
+# Divert the Output to a Text file
+
+```{r Capture the Output, echo=FALSE, warning=FALSE, message=FALSE}
+ps<-"C:/Public/Instacart/output.txt"
+sink(ps, append=TRUE, split=FALSE)
+unlink(ps)
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
