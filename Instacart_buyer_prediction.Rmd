@@ -6,13 +6,13 @@ output:
   html_notebook: default
 ---
 
-#Description 
-
-In this competition, Instacart is challenging the Kaggle community to use this anonymized data on customer orders over time to predict which previously purchased products will be in a user's next order. 
-
-- The Sample submission file has the user's next order and the products present in the next order 
-- If there are "n" users them the number of rows in the submission file will be "n"
-- Not looking for the best model but a strong F statistic or an accurate model
+  #Description 
+  
+  In this competition, Instacart is challenging the Kaggle community to use this anonymized data on customer orders over time to predict which previously purchased products will be in a user's next order. 
+  
+  - The Sample submission file has the user's next order and the products present in the next order 
+  - If there are "n" users them the number of rows in the submission file will be "n"
+  - Not looking for the best model but a strong F statistic or an accurate model
 
 ## Getting the Data
 ```{r Getting the Data, eval=TRUE, warning=FALSE, echo=FALSE, eval=FALSE}
@@ -122,14 +122,16 @@ colnames(ordcount)[colnames(ordcount)=="N"]<-"order_count"
 
 library(ggplot2)
 b<-ggplot(data = ordcount, aes(x=user_id, y=order_count, alpha=0.8))
-b+geom_bar(stat = "identity")
+#debug 
+#b+geom_bar(stat = "identity")
 
 library(dplyr)
 new_ordcount <- ordcount[order(-order_count), ]
 head(new_ordcount)
 quantile(new_ordcount$order_count, probs = seq(0,1,0.05))
 
-ggplot(new_ordcount, aes(sample=order_count)) + stat_qq()
+#debug
+#ggplot(new_ordcount, aes(sample=order_count)) + stat_qq()
 
 
 ```
@@ -165,8 +167,9 @@ quantile(res.product.name.count[order(-pnames_count)]$pnames_count, probs = seq(
 bar <- ggplot(res.product.name.count[order(-pnames_count)][1:20]) +
   geom_bar(mapping = aes(x=product_name, y=pnames_count), stat = "identity")+
   ggtitle(label = "Top 20 Products Ordered by Users")
-  
-bar+coord_flip()
+
+#debug  
+#bar+coord_flip()
 
 product_count <- res_final.dt[, .(order_id, user_id, product_id, product_name)][, .(.N), by= .(order_id, user_id)]
 colnames(product_count)[colnames(product_count)=="N"]<-"product_count"
@@ -180,14 +183,21 @@ head(res_sort,20)
 # res_sort has the total number product count of each user for each order_id
 res_sort$color <- ifelse(res_sort$product_count > 30 ,"red",NA)
 temp<-res_sort[order_id %in% c(1:1000)]
-ggplot(temp, aes(x = order_id, y=product_count, colour = color)) + 
-  geom_bar(stat="identity", position = "dodge")+
-  theme_minimal() + scale_colour_identity()
+
+#debug
+#ggplot(temp, aes(x = order_id, y=product_count, colour = color)) + geom_bar(stat="identity", position = "dodge")+
+#  theme_minimal() + scale_colour_identity()
 
 
 ```
 
+
+
+
 ## Habit analysis of each user based on the products ordered sequence
+
+### The Four R code chunks below are not required for the 2nd submission as they belong to the 1st submission
+
   - Broken the data set to analyze which user is ordering which product more
   - Used tapply and data table methods to find out that we are having the memory issues so had to break down the data-table
 
@@ -314,7 +324,10 @@ b
 counterout <<- 0
 finalset <<- list()
 matchflag <<- FALSE
-precistionconstant = 10 # change this as per requirement
+precistionconstant = 20 # change this as per requirement
+
+  # Try 1- 10
+  # Try 2- 20
 
 res.1<-lapply(order_test.dt$user_id[1:length(order_test.dt$user_id)], function(x) {
   counterout <<- counterout+1
@@ -362,6 +375,183 @@ library(dplyr)
 test.sub <- submission[c(1:20),]
 ps1<-"C:/Public/Instacart/submission.csv"
 write.table(submission, file = ps1, sep=",", col.names = TRUE, row.names = FALSE)
+
+```
+
+
+## Analysis for additional optimizations of the F score and use of xgboost
+
+  - Experimenting only with two features order_dow and reordered for now , will include more later
+  - Based on the DOW and hour of day we can add or delete some of the products
+
+```{r Additional optimization, warning=FALSE, message=TRUE, eval=TRUE, echo=FALSE}
+#res_final.dt[user_id==1, .N]
+#head(order_test.dt,10)
+habitopt1.dt <- NULL
+habitopt2.dt <- NULL
+habitopt1.dt <- res_final.dt[, .(order_id, user_id, order_number, order_dow, order_hour_of_day, product_id, reordered)]
+
+#head(habitopt1.dt,10)
+
+habitopt2.dt <- habitopt1.dt[, .(order_id, user_id, order_dow, reordered, product_id)][order(user_id)][,.(user_id,order_dow,product_id)]
+#habitopt2.dt[1:20]
+
+# Subsetting only 10 first test orders 
+testprelim.dt <- order_test.dt[1:10][,.(order_id, user_id, order_dow,order_hour_of_day)]
+useridlist.test <- unique(order_test.dt$user_id)
+
+# Based on Order_dow , check which Product Ids can be eliminated or kept
+habitopt2.dt = NULL 
+habitopt2.dt <- habitopt1.dt[, .(user_id, order_dow, product_id)][order(user_id, order_dow)][user_id %in% useridlist.test,.N, by = .(user_id,order_dow, product_id)]
+colnames(habitopt2.dt)[colnames(habitopt2.dt)=="N"]<-"product_count"
+# find the frequency of each Product ID for user id 1
+
+# Get the top products for each order_dow and compare the solutions that you have or the test set directly
+habitopt3.dt = NULL
+# retun only the top 5% of each dow for the user
+threshold = 0.3 # considering 30% , you can consider higher as well
+
+# This is only for user id 1 , this will be a data table when we consider all the user Ids
+# Get this list for each user id
+val_of_dow<-lapply(unique(habitopt2.dt$user_id), function (x) {
+  ceiling(threshold*habitopt2.dt[user_id %in% x][order(-product_count)][, lapply(.SD, length), by = .(order_dow), .SDcols = c("product_count")]$product_count)
+})
+
+#habitopt2.dt$user_id[1]
+j<<-0
+data.resnew <- data.table()
+for(i in unique(habitopt2.dt$user_id)){ #Create data table final based on the userids you have
+  countval <<- 0
+  j<<-j+1
+  tempnew <- habitopt2.dt[user_id %in% i][order(-product_count)][, lapply(.SD, FUN = function(x){
+  countval <<- countval + 1
+  head(x, val_of_dow[[j]][countval])
+}), by = .(user_id,order_dow), .SDcols = c("product_id")]
+  
+  data.resnew <- rbindlist(list(data.resnew, tempnew))
+}
+
+
+
+data.rescomb <- data.table()
+for (i in unique(data.resnew$user_id)) {
+  tempnew2<-data.resnew[user_id %in% i][, .(combined_val=paste(c(product_id), collapse = " ")), by=.(user_id, order_dow)]
+  data.rescomb<-rbind_list(data.rescomb, tempnew2)
+}
+
+cols<-c("user_id", "order_dow")
+data.rescomb$combcomp<-do.call(paste, c(data.rescomb[cols], sep="-"))
+
+order_test.dt.res1<-NULL
+order_test.dt.res1<-order_test.dt[,.(user_id, order_dow)]
+order_test.dt.res1$combcomp<-apply(order_test.dt.res1[, cols,with=FALSE], 1, paste, collapse="-")
+
+head(data.rescomb,30)
+data.rescomb<-as.data.table(data.rescomb)
+# Debug: with one user id
+# countval<<-0
+# habitopt2.dt[user_id %in% 1][order(-product_count)][, lapply(.SD, FUN = function(x){
+#   countval <<- countval + 1
+#   head(x, val_of_dow[[1]][countval])
+# }), by = .(user_id,order_dow), .SDcols = c("product_id")]
+# Debug: with the use of assign and paste to create multiple data tables
+  #nam<-paste("dt", i, sep = ".")
+#   assign(nam, 
+#          habitopt2.dt[user_id %in% i][order(-product_count)][, lapply(.SD, FUN = function(x){
+#   countval <<- countval + 1
+#   head(x, val_of_dow[[i]][countval])
+# }), by = .(order_dow), .SDcols = c("product_id")])
+
+# Getting the Products combined into one list
+
+```
+## Getting the Final results here
+
+### Helper sites 
+  - https://stackoverflow.com/questions/41936175/r-function-to-evaluate-the-values-in-data-table-columns-against-another-set-of-v
+
+  - https://stackoverflow.com/questions/18359456/paste-two-data-table-columns
+
+  - https://stackoverflow.com/questions/14568662/paste-multiple-columns-together
+
+  - https://stackoverflow.com/questions/5965698/merge-unequal-dataframes-and-replace-missing-rows-with-0
+
+  - https://stackoverflow.com/questions/30913338/join-two-data-tables-and-use-only-one-column-from-second-dt-in-r
+  
+  - https://aurelienmadouasse.wordpress.com/2012/05/22/r-code-how-to-convert-a-list-to-a-data-frame/
+
+```{r Final results with optimization and addition of dow predictor, echo=FALSE, message=TRUE, warning=FALSE}
+# if the match is not there , then get none or else just get the combined_val
+prodidcombcol<<-NULL
+
+# Test done
+dt1<-data.rescomb[, .(combcomp,combined_val)][1:30]
+dt2<-order_test.dt.res1[1:10]
+dt2
+setkey(setDT(dt2), combcomp)
+dt2[dt1, combined_val := i.combined_val]
+dt2[is.na(dt2)]<-"None"
+dt2
+
+
+
+#Actual work
+# TODO : optimize to fill some of the None's with proper estimates
+dt1<-NULL
+dt2<-NULL
+setkey(setDT(order_test.dt.res1), combcomp)
+dt1<-data.rescomb[, .(combcomp, combined_val)]
+order_test.dt.res1[dt1, combined_val := i.combined_val]
+#order_test.dt.res1[is.na(order_test.dt.res1)]<-"None" 
+head(order_test.dt.res1)
+
+
+dt3<-order_test.dt.res1[, .(user_id, combined_val)]
+dt4<-order_test.dt[, .(order_id, user_id)]
+setkey(dt3,user_id)
+setkey(dt4,user_id)
+res.subm<-dt4[dt3,nomatch=0]
+res.subm2<-res.subm[, .(order_id, products=combined_val)]
+
+ps3<-"C:/Public/Instacart/submission.csv"
+sol1.dt <- fread(ps3)
+
+j<<-0
+valx<-lapply(sol1.dt$order_id, function(x) {
+  j <<- j+1
+  if (is.na(res.subm2$products[j])) {
+    #print("entering")
+    res.subm2$products[j]<-sol1.dt$products[j]
+  }
+  else {
+    res.subm2$products[j]<-res.subm2$products[j]
+  }
+})
+
+k<<-0
+valy<-lapply(res.subm2$order_id, function(z) {
+  k<<-k+1
+  if (sol1.dt$products[k]=="None") {
+    sol1.dt$products[k]<-res.subm2$products[k]
+  }
+  else {
+    sol1.dt$products[k]<-sol1.dt$products[k]
+  }
+})
+
+
+#dfn1<- do.call(rbind.data.frame,valx)
+dfn1<-data.frame(
+         lNames = "Products",
+         lVal = unlist(valy))
+
+dfn1$lNames <- sol1.dt$order_id
+colnames(dfn1) <- c("order_id", "products")
+
+# Test to get a csv and then we can do submission 
+ps4<-"C:/Public/Instacart/submission4.csv"
+fwrite(dfn1, ps4)
+
 ```
 
 
